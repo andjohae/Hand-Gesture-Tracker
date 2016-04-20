@@ -1,5 +1,6 @@
 clc
 clear all
+%%
 I = imread('images/image1.jpg');
 figure(1)
 imshow(I);
@@ -63,5 +64,15 @@ plot(t,normpdf(t,mu(2),s(2)),'g')
 plot(t,normpdf(t,mu(3),s(3)),'b')
 
 %%
-%mvnpdf(X,MU,SIGMA) 
-phat = mle(rgb,'distribution','mvn')
+I_norm = ones(size(I,1),size(I,2));
+
+for i = 1:size(I,1)
+  for j = 1:size(I,2)
+    I_norm(i,j) = mvnpdf(double([I(i,j,1) I(i,j,2) I(i,j,3)]),mu, cov(rgb));
+  end
+end
+sum(sum(I_norm))
+
+%%
+%R = R / sum(R G B)
+%R = R / sqrt(sum(R^2 G^2 B^2)
