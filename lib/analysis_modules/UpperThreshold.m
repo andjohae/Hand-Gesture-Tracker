@@ -1,32 +1,23 @@
-function midwayThreshold = UpperThreshold(image)
-  % Estimates a threshold starting from 255 and moving 
-  % down until a minimum is estimated.
-  %
-  % Parameters: 
-  %   image - Greyscale image
-  
-  [binCounts, ~] = histcounts(image, 0:256);
+function th = UpperThreshold(image)
+% Estimates a threshold starting from 255 and moving
+% down until a minimum is estimated.
+%
+% Parameters:
+%   image - Greyscale image
 
-  threshold = round(initialThreshold);
-  tmpThreshold = -1;
-  
-  while (threshold ~= tmpThreshold)
-    
-    lowMean = sum((1:threshold) .* binCounts(1:threshold)) ./ ...
-        sum(binCounts(1:threshold));
-    highMean = sum((threshold+1:256) .* binCounts(threshold+1:end)) ./ ...
-        sum(binCounts(threshold+1:end));
-    
-    tmpThreshold = round((lowMean + highMean)./2);
-    
-    if (threshold == tmpThreshold)
-      break;
-    else
-      threshold = tmpThreshold;
-    end
-    
+[binCounts, ~] = histcounts(image, 0:256);
+
+th = find(binCounts,1,'last') - 1;
+max = 0;
+while th > 1
+  % count at th
+  tmp = binCounts(th + 1);
+  if tmp > max
+    max = tmp;
+  elseif tmp < 0.1*max
+    break
   end
-  
-  midwayThreshold = threshold;
-  
+  th = th - 1;
+end
+
 end
