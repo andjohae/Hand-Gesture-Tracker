@@ -16,36 +16,87 @@ addpath('../images');
 addpath('../lib/analysis_modules/');
 
 % Read images
-img = imread('image3.jpg'); 
-imgSize = size(img);
+img = imread('image1.jpg'); 
 figure(1);
 imshow(img);
 
-%% Create bw image from thresholding on R-channel
+%% Create binary image from thresholding on R-channel
 clc;
 rc = img(:,:,1);
-threshold = MidwayThreshold(rc,200)
+imgSize = size(rc);
+threshold = MidwayThreshold(rc,200);
+fprintf('Estimated threshold: %d\n',threshold);
 bwImg = rc > threshold;
 
 structuralElement = strel('disk',3);
 bwImg = imopen(bwImg, structuralElement);
 
-imshow(bwImg);
+imshow(bwImg)
 
 %% Perimeter
-boundary = ExtractObjectBoundary(bwImg);
-[Y,X] = ind2sub(imgSize,boundary);
-hold on;
-  plot(X,Y,'r','LineWidth',2);
-hold off;
+boundaryIndex = ExtractObjectBoundary(bwImg);
+boundaryImg = zeros(imgSize);
+boundaryImg(boundaryIndex) = 1;
+imshow(boundaryImg);
+
+% % Draw with
+[Y,X] = ind2sub(imgSize,boundaryIndex);
+% hold on;
+%   plot(X,Y,'k','LineWidth',2);
+% hold off;
 
 CONST_4 = 4*sqrt(2)/pi;
-perimeter = length(boundary)/CONST_4;
+perimeter = length(boundaryIndex); % /CONST_4 % in Lecture notes!
 fprintf('Perimeter: %.2f\n',perimeter);
 
 %% Compactness
+% % Uncomment the section if you want to use 'FillAreaInsideBoundary()'
+% [Y,X] = ind2sub(imgSize,boundaryIndex);
+% seedIndex = round( mean( [Y, X] ) );
+% seedIndex = sub2ind(imgSize,seedIndex(1),seedIndex(2));
+% filledBWImg = FillAreaInsideBoundary(boundaryIndex,imgSize,seedIndex);
+
+filledBWImg = imfill(boundaryImg);
+imshow(filledBWImg);
+
+area = sum(filledBWImg(:));
+
+compactness = area./(perimeter.^2); % *4*pi % in Lecture notes!
+fprintf('Compactnes: %.3f\n',compactness);
 
 
 %% Convexity
+convexHullIndices = convhull(X,Y);
+convexHullImg = zeros(imgSize);
+convexHullImg(convexHullIndices) = 1;
+imshow(convexHullImg);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
