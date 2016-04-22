@@ -30,13 +30,26 @@ Ir=double(I(:,:,1))./double(Isum);
 Ig=double(I(:,:,2))./double(Isum);
 Ib=double(I(:,:,3))./double(Isum);
 
-subplot(1,3,1)
+subplot(2,3,1)
 imshow(Ir)
-subplot(1,3,2)
+subplot(2,3,2)
 imshow(Ig)
-subplot(1,3,3)
+subplot(2,3,3)
 imshow(Ib)
 
+Isum2 = sqrt(double(I(:,:,1)).^2 + double(I(:,:,2)).^2 + double(I(:,:,3)).^2);
+Irn=double(I(:,:,1))./double(Isum2);
+Ign=double(I(:,:,2))./double(Isum2);
+Ibn=double(I(:,:,3))./double(Isum2);
+
+subplot(2,3,4)
+imshow(Irn)
+subplot(2,3,5)
+imshow(Ign)
+subplot(2,3,6)
+imshow(Ibn)
+
+%%
 figure(7); clf
 subplot(1,3,1)
 imhist(Ir)
@@ -74,5 +87,31 @@ end
 sum(sum(I_norm))
 
 %%
+figure(8); clf
+I_cart = ones(size(I,1),size(I,2));
+
+for i = 1:size(I,1)
+  for j = 1:size(I,2)
+    I_cart(i,j) = norm(double([I(i,j,1) I(i,j,2) I(i,j,3)].^2) - mu);
+    %I_cart(i,j) = norm(double([Ir(i,j) Ig(i,j) Ib(i,j)]) - mu/255);
+    %I_cart(i,j) = norm(double([Irn(i,j) Ign(i,j) Ibn(i,j)]) - mu/255);
+  end
+end
+imshow(I_cart,[0 255]);
+%imshow(I_cart);
+
+%%
+clc
+I = imread('images/image1.jpg');
+figure(1)
+%imshow(I);
+
+Ired = I(:,:,1);
+subplot(1,2,1);
+imshow(Ired)
+
+subplot(1,2,2)
+imshow(RedChannel2Binary(I));
+
 %R = R / sum(R G B)
 %R = R / sqrt(sum(R^2 G^2 B^2)
