@@ -279,4 +279,4 @@ subplot(1,2,2)
 imshow(RedChannel2Binary(I));
 
 %R = R / sum(R G B)
-%R = R / sqrt(sum(R^2 G^2 B^2)
+%R = R / sqrt(sum(R^2 G^2 B^2)foo
