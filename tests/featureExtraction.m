@@ -39,7 +39,6 @@ boundaryImg = zeros(imgSize);
 boundaryImg(boundaryIndex) = 1;
 imshow(boundaryImg);
 
-% % Draw with
 [Y,X] = ind2sub(imgSize,boundaryIndex);
 % hold on;
 %   plot(X,Y,'k','LineWidth',2);
@@ -47,7 +46,7 @@ imshow(boundaryImg);
 
 CONST_4 = 4*sqrt(2)/pi;
 perimeter = length(boundaryIndex); % /CONST_4 % in Lecture notes!
-fprintf('Perimeter: %.2f\n',perimeter);
+fprintf('Perimeter:\t%d\n',perimeter);
 
 %% Compactness
 % % Uncomment the section if you want to use 'FillAreaInsideBoundary()'
@@ -60,43 +59,19 @@ filledBWImg = imfill(boundaryImg);
 imshow(filledBWImg);
 
 area = sum(filledBWImg(:));
+fprintf('Area:\t\t%d\n',area);
 
 compactness = area./(perimeter.^2); % *4*pi % in Lecture notes!
-fprintf('Compactnes: %.3f\n',compactness);
+fprintf('Compactness:\t%.5f\n',compactness);
 
 
 %% Convexity
-convexHullIndices = convhull(X,Y);
-convexHullImg = zeros(imgSize);
-convexHullImg(convexHullIndices) = 1;
+convexHullImg  = bwconvhull(filledBWImg);
 imshow(convexHullImg);
 
+convexBoundary = ExtractObjectBoundary(convexHullImg);
+convexPerimeter = length(convexHullImg);
 
+convexity = convexPerimeter./perimeter;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+fprintf('Convexity:\t%.5f\n',convexity);
