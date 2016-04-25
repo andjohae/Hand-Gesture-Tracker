@@ -48,6 +48,21 @@ CONST_4 = 4*sqrt(2)/pi;
 perimeter = length(boundaryIndex); % /CONST_4 % in Lecture notes!
 fprintf('Perimeter:\t%d\n',perimeter);
 
+%% Alternative perimiter extraction (as used by Mattias Andersson)
+structElement_8way = strel('square',3);    % Use for 8-way connectivity
+structElement_4way = strel('diamond',1);  % Use for 4-way connectivity
+erodedImg = imerode(bwImg, structElement_8way);
+perimeterImg = bwImg - erodedImg;
+imshow(perimeterImg);
+
+% Perimeter length:
+perimeterAlt = length(find(perimeterImg));
+fprintf('Perimeter:\t%d\t(alternative)\n',perimeterAlt);
+
+% NOTE: The 8-way connectivity choice yields the same perimeter length as
+% my old function 'ExtractOjbectBoundary'. 
+% This new method should be a lot faster!
+
 %% Compactness
 % % Uncomment the section if you want to use 'FillAreaInsideBoundary()'
 % [Y,X] = ind2sub(imgSize,boundaryIndex);
@@ -75,3 +90,22 @@ convexPerimeter = length(convexHullImg);
 convexity = convexPerimeter./perimeter;
 
 fprintf('Convexity:\t%.5f\n',convexity);
+
+%% Thickness (as used by Mattias Andersson)
+tmpBwImg = bwImg;
+nErosions = 0;
+
+while any(tmpBwImg(:))
+  tmpBwImg = imerode(tmpBwImg, structElement_8way);
+  nErosions = nErosions + 1;
+end
+
+fprintf('Number of erosions: %d\n', nErosions);
+fprintf('Thickness: %d\n', 2*nErosions);
+
+%% Mattias Andresson's shape independent features
+% Formfactor = (4*pi) * Area / Perimeter^2
+% Elongtedness = Area / Thickness^2
+% Convexity = Convex_perimeter / Perimeter
+% Solidity = Area / Convex_area
+
