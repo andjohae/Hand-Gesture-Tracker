@@ -103,9 +103,11 @@ end
 fprintf('Number of erosions: %d\n', nErosions);
 fprintf('Thickness: %d\n', 2*nErosions);
 
-%% Mattias Andresson's shape independent features
+%% Mattias Andresson's size independent features
 % Formfactor = (4*pi) * Area / Perimeter^2
 % Elongtedness = Area / Thickness^2
 % Convexity = Convex_perimeter / Perimeter
 % Solidity = Area / Convex_area
 
+clc;
+features = GetFeatures(bwImg)
