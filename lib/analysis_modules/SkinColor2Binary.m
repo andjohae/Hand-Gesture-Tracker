@@ -2,12 +2,8 @@
 % Input 
 function newImage = SkinColor2Binary(oldImage)
 
-redCh       = double(oldImage(:,:,1));
-greenCh     = double(oldImage(:,:,2));
-blueCh      = double(oldImage(:,:,3));
-structElem  = strel('disk',5);
-%newImage    = imdilate((redCh > greenCh) & greenCh > blueCh,structElem);
-newImage    = redCh > greenCh & greenCh > blueCh;
+structElem  = strel('disk',3);
+newImage    = im2bw(oldImage(:,:,1),0.7);
 newImage    = imopen(newImage,structElem);
 
 
