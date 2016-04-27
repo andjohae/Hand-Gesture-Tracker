@@ -36,7 +36,7 @@ function handArea = FindHandInImage(jpgImage)
 
   % Sorting the extracted binary regions with largest area first.
   [~,areaIdx] = sort(-[binaryRegions.Area]);
-  lastIdx = min(10,length(areaIdx));
+  lastIdx = min(10,length(areaIdx))
   bBox = cat(1,binaryRegions.BoundingBox);
 
   % The first index corresponds to the index in the bounding box
@@ -49,14 +49,14 @@ function handArea = FindHandInImage(jpgImage)
   for i = 1:lastIdx
 
     % Converting the bounding box 
-    newFeatures = GetFeatures(imcrop(binaryImage,bBox(areaIdx(i),:)));
+    newFeatures = GetFeatures(imcrop(binaryImage,bBox(areaIdx(i),:)))
     % The distance metric for the feature vectors.
-    matchFactor = sum(abs(newFeatures - templateFeatures));
+    matchFactor = sum(abs(newFeatures - templateFeatures)./ ...
+                      abs(newFeatures + templateFeatures))
 
     % Update the most likely area that might contain a hand.
     if(matchFactor < bestMatchedArea(2))
       bestMatchedArea = [i, matchFactor];
-      matchFactor
     end
 
   end
