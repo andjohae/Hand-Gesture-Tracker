@@ -1,8 +1,8 @@
 %% Skin color extractor from a given mean in vanilla RGB.
 function gray = Mean2Gray1(image, mu)
 
-width = size(image,1);
-height = size(image,2);
+height = size(image,1);
+width = size(image,2);
 
 gray = zeros(width, height);
 
