@@ -1,0 +1,7 @@
+% Example of a key table file to be used with EvaluateFeatureChoices()
+% Format: 'filename \t bool', where 'bool==1' indicates a hand 
+image1.jpg  1
+image2.jpg  0
+image4.jpg  1
+image5.jpg  1
+image3.jpg  0
