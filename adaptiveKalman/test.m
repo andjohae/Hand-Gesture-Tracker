@@ -9,46 +9,64 @@ currAxes = axes;
 vidObj = VideoReader('testMov1.mov');
 
 prevImage = readFrame(vidObj);
-centerPoints = [NaN, NaN];
 
 while hasFrame(vidObj)
-  binaryPrevImage = ExtractSkinColor(prevImage);
-  curImage = readFrame(vidObj);
-  binaryCurImage = ExtractSkinColor(curImage);
-  motionImage = ExtractMotion(prevImage, curImage);
-  combinedImage = (binaryPrevImage & motionImage) | (binaryCurImage & motionImage);
-  center = ComputeCenterOfMass(combinedImage);
-  imshow(curImage);
-  hold on;
-  viscircles(center,10);
-  currAxes.Visible = 'off';
-  pause(1/vidObj.FrameRate);
-  prevImage = curImage; 
-  centerPoints = [centerPoints; center];
-  shg
+  
+  % Read Every fifth frame
+  for i = 1:5
+    if(hasFrame(vidObj))
+      readFrame(vidObj);
+    else 
+      break;
+    end
+  end
+  
+  
+  if(hasFrame(vidObj))
+    binaryPrevImage = ExtractSkinColor(prevImage);
+    curImage = readFrame(vidObj);
+    binaryCurImage = ExtractSkinColor(curImage);
+    motionImage = ExtractMotion(prevImage, curImage);
+    combinedImage = (binaryCurImage & motionImage) | (binaryPrevImage & motionImage);
+    %regionOfInterest = 
+    [x,y,w,h] = ComputeRegionOfInterest(combinedImage);
+    imshow(curImage);
+    hold on;
+
+    if(x ~= -1)
+      rectangle('Position',[x,y,w,h]);
+    end
+
+    currAxes.Visible = 'off';
+    pause(1/vidObj.FrameRate);
+    prevImage = curImage; 
+    shg
+  end
 end
-%%
-clf;
-imshow(prevImage);
-hold on
-plot(centerPoints(:,1),centerPoints(:,2));
-shg
 
 %%
-binaryPrevImage = ExtractSkinColor(prevImage);
-binaryCurImage = ExtractSkinColor(prevImage);
-motionImage = ExtractMotion(prevImage, curImage);
-subplot(2,2,1)
-imshow(binaryPrevImage);
-subplot(2,2,2)
-imshow(motionImage);
-subplot(2,2,3)
-combinedImage = (binaryPrevImage & motionImage);
-imshow(combinedImage);
-subplot(2,2,4)
-center = ComputeCenterOfMass(combinedImage);
-imshow(combinedImage);
-hold on
-viscircles(center,10)
 
+clf
+addpath('./../images/sequenceImages-05-02/')
+addpath('./../images/')
+I1 = imread('im2.jpg');
+I2 = imread('im3.jpg');
+binarySkin = ExtractSkinColor(I2);
+%regions = bwpropfilt(binarySkin,'Area',2) - bwpropfilt(binarySkin,'Area',1);
+regions = bwpropfilt(binarySkin,'Perimeter',10);
+%imshow(regions);
+%rectangle('Position',regions.BoundingBox)
 shg
+binaryMotion = ExtractMotion(I1,I2);
+imshow(binaryMotion & binarySkin)
+shg
+%combinedImage = (binarySkin & binaryMotion);
+%[x,y,w,h] = ComputeRegionOfInterest(combinedImage);
+%%
+imshow(I2);
+hold on
+rectangle('Position',[x,y,w,h]);
+shg
+
+
+

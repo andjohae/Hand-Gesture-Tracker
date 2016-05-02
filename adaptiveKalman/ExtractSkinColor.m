@@ -17,17 +17,18 @@ function binaryImage = ExtractSkinColor(jpegImage)
   
   xDim = length(ycbcrImage(:,1,1));
   yDim = length(ycbcrImage(1,:,1));
-  binaryImage = zeros(xDim,yDim);
   
   for i = 1:xDim
     for j = 1:yDim
       if( (CbLowerBound < Cb(i,j) && Cb(i,j) < CbUpperBound) && ...
           (CrLowerBound < Cr(i,j) && Cr(i,j) < CrUpperBound))
-         binaryImage(i,j) = 1; 
+        binaryImage(i,j) = true; 
+      else 
+        binaryImage(i,j) = false;
       end
     end
   end
   
-  %binaryImage = imdilate(binaryImage, strel('disk',5));
+  binaryImage = imdilate(binaryImage, strel('disk',3));
 
 end
