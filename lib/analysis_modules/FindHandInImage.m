@@ -27,16 +27,17 @@ function handArea = FindHandInImage(jpgImage)
 
   % Converting the image to binary regions.
   binaryImage = SkinColor2Binary(jpgImage);
-  figure(4)
-  imshow(binaryImage);
-  shg
+  %figure(4)
+  %imshow(binaryImage);
+  %shg
   
   % Extracting the binary regions from binaryImage.
   binaryRegions = regionprops(binaryImage);
 
   % Sorting the extracted binary regions with largest area first.
+  % TODO: Remove potentially overlapping images.
   [~,areaIdx] = sort(-[binaryRegions.Area]);
-  lastIdx = min(10,length(areaIdx))
+  lastIdx = min(10,length(areaIdx));
   bBox = cat(1,binaryRegions.BoundingBox);
 
   % The first index corresponds to the index in the bounding box
@@ -49,10 +50,10 @@ function handArea = FindHandInImage(jpgImage)
   for i = 1:lastIdx
 
     % Converting the bounding box 
-    newFeatures = GetFeatures(imcrop(binaryImage,bBox(areaIdx(i),:)))
+    newFeatures = GetFeatures(imcrop(binaryImage,bBox(areaIdx(i),:)));
     % The distance metric for the feature vectors.
     matchFactor = sum(abs(newFeatures - templateFeatures)./ ...
-                      abs(newFeatures + templateFeatures))
+                      abs(newFeatures + templateFeatures));
 
     % Update the most likely area that might contain a hand.
     if(matchFactor < bestMatchedArea(2))
