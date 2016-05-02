@@ -1,20 +1,12 @@
-function bin = Ycc2Binary(image, mu)
+function bin = Ycc2Binary(image, lims)
 
-% Skin color extraction using a mean value given in
-% YCrCb color format.
-
-height = size(image,1);
-width = size(image,2);
-
+% Skin color extraction using a lims given in
+% YCrCb color format for [Cb; Cr].
 
 y = rgb2ycbcr(image);
 
-bin = zeros(height, width);
 
-for i = 1:height
-  for j = 1:width
-    bin(i,j) = norm([double(y(i,j,2)) double(y(i,j,3))] - mu,2) < 45;
-  end
-end
+bin = lims(1,1) <= y(:,:,2) & y(:,:,2) <= lims(1,2)...
+    & lims(2,1) <= y(:,:,3) & y(:,:,3) <= lims(2,2);
 
 end
