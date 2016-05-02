@@ -6,9 +6,10 @@ function binaryImage = ExtractMotion(prevJpegImage, curJpegImage)
 
   %Fdg_t = rgb2gray(Fd_t);
   threshold = 0.05*sum(sum(Fdg_t))./prod(size(Fdg_t));
-  Fdg_t = imdilate(Fdg_t,strel('disk',5));
+  %Fdg_t = imdilate(Fdg_t,strel('disk',5));
+  prod(size(Fdg_t))
   
   binaryImage = ((Fdg_t ./ 255) >= threshold);
-  imshow(binaryImage);
-  shg
+  %imshow(binaryImage);
+  %shg
 end

@@ -1,47 +1,76 @@
 %% Finding a hand in an image.
 
 clf
-addpath('./movementLvl3')
-addpath('./Hand-Gesture-Tracker/images/images-04-29/')
-addpath('./Hand-Gesture-Tracker/images/images-04-26/')
-
 currAxes = axes;
 vidObj = VideoReader('testMov1.mov');
 
 prevImage = readFrame(vidObj);
+newImage = readFrame(vidObj);
+binaryNewImage = ExtractSkinColor(newImage);
+regions = regionprops(binaryNewImage);
+imshow(newImage)
+hold on
+[~, sortedIdxs] = sort(-[regions.Area]);
+centroids = cat(1,regions.Centroid);
+bBox = cat(1,regions.BoundingBox);
+x = centroids(sortedIdxs(1),1);
+y = centroids(sortedIdxs(1),2);
+plot(x,y,'r*')
+%rectangle('Position',bBox(sortedIdxs(1),:));
+%ExtractMotion(prevImage,newImage);
+shg
+
+%% Using only regions....
+
+clf; clear all
+currAxes = axes;
+vidObj = VideoReader('testMov1.mov');
 
 while hasFrame(vidObj)
   
-  % Read Every fifth frame
-  for i = 1:5
-    if(hasFrame(vidObj))
-      readFrame(vidObj);
-    else 
-      break;
-    end
-  end
-  
-  
-  if(hasFrame(vidObj))
-    binaryPrevImage = ExtractSkinColor(prevImage);
-    curImage = readFrame(vidObj);
-    binaryCurImage = ExtractSkinColor(curImage);
-    motionImage = ExtractMotion(prevImage, curImage);
-    combinedImage = (binaryCurImage & motionImage) | (binaryPrevImage & motionImage);
-    %regionOfInterest = 
-    [x,y,w,h] = ComputeRegionOfInterest(combinedImage);
-    imshow(curImage);
-    hold on;
+  tic;
+  currentImage = readFrame(vidObj);
+  binaryImage = ExtractSkinColor(currentImage);
+  regions = regionprops(binaryImage);
+  [~, sortedIdxs] = sort(-[regions.Area]);
+  centroids = cat(1,regions.Centroid);
+  bBox = cat(1,regions.BoundingBox);
+  x = centroids(sortedIdxs(1),1);
+  y = centroids(sortedIdxs(1),2);  
+ 
+  image(currentImage-0.004);
+  hold on;
+  plot(x,y,'r*')
 
-    if(x ~= -1)
-      rectangle('Position',[x,y,w,h]);
-    end
+  currAxes.Visible = 'off';
+  %pause(1/vidObj.FrameRate);
+  pause(0.001);
+  shg
+  toc
 
-    currAxes.Visible = 'off';
-    pause(1/vidObj.FrameRate);
-    prevImage = curImage; 
-    shg
+end
+
+%% Using motions....
+while hasFrame(vidObj)
+  
+  binaryPrevImage = ExtractSkinColor(prevImage);
+  curImage = readFrame(vidObj);
+  binaryCurImage = ExtractSkinColor(curImage);
+  motionImage = ExtractMotion(prevImage, curImage);
+  combinedImage = (binaryCurImage & motionImage) | (binaryPrevImage & motionImage);
+  [x,y,w,h] = ComputeRegionOfInterest(combinedImage);
+  imshow(curImage);
+  hold on;
+
+  if(x ~= -1)
+    rectangle('Position',[x,y,w,h]);
   end
+
+  currAxes.Visible = 'off';
+  pause(1/vidObj.FrameRate);
+  prevImage = curImage;
+  shg
+
 end
 
 %%
