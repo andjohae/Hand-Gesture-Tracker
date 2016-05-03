@@ -1,12 +1,12 @@
-function bin = Hsv2Binary(image, lims)
+function bin = Hsv2Binary(image)
 
-% Skin color extraction using a lims given in
-% YCrCb color format for [Cb; Cr].
+% Skin color extraction using a hard coded LIMITS
+% HSV color format for Hue and Saturation.
 
+LIMITS = [0 0.5; 0 0.4];
 h = rgb2hsv(image);
 
-
-bin = lims(1,1) <= h(:,:,1) & h(:,:,1) <= lims(1,2)...
-    & lims(2,1) <= h(:,:,2) & h(:,:,2) <= lims(2,2);
+bin = LIMITS(1,1) <= h(:,:,1) & h(:,:,1) <= LIMITS(1,2)...
+    & LIMITS(2,1) <= h(:,:,2) & h(:,:,2) <= LIMITS(2,2);
 
 end
