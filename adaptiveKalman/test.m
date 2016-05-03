@@ -76,19 +76,23 @@ end
 %%
 
 clf
+addpath('./../images/images-04-29/')
 addpath('./../images/sequenceImages-05-02/')
 addpath('./../images/')
-I1 = imread('im2.jpg');
-I2 = imread('im3.jpg');
+%I1 = imread('.jpg');
+I2 = imread('redBack5.jpg');
 binarySkin = ExtractSkinColor(I2);
+binarySkin = imfill(binarySkin,'holes');
 %regions = bwpropfilt(binarySkin,'Area',2) - bwpropfilt(binarySkin,'Area',1);
-regions = bwpropfilt(binarySkin,'Perimeter',10);
+imshow(binarySkin);
+shg
+%regions = bwpropfilt(binarySkin,'Perimeter',10);
 %imshow(regions);
 %rectangle('Position',regions.BoundingBox)
-shg
-binaryMotion = ExtractMotion(I1,I2);
-imshow(binaryMotion & binarySkin)
-shg
+%shg
+%binaryMotion = ExtractMotion(I1,I2);
+%imshow(binaryMotion & binarySkin)
+%shg
 %combinedImage = (binarySkin & binaryMotion);
 %[x,y,w,h] = ComputeRegionOfInterest(combinedImage);
 %%
