@@ -1,6 +1,7 @@
 addpath(genpath('./lib/'))
 
-I = imread('images/image1.jpg');
+%I = imread('images/image1.jpg');
+I = imread('~/tmp/Hands/out.jpg');
 
 figure(1); clf
 imshow(I)
