@@ -11,9 +11,10 @@ if ~isCorrectPWD
   break;
 end
 
-% Initialization
-addpath('../images');
-addpath('../lib/analysis_modules/');
+% Initialization('../images');
+addpath('../lib//');
+addpath(genpath('../images'));
+addpath(genpath('../lib/'));
 
 % Read images
 img = imread('image1.jpg'); 
