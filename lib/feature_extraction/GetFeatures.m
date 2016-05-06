@@ -48,6 +48,6 @@ function features = GetFeatures(binaryImg)
   convexity = convexPerimeter / perimeter;
   solidity = area / convexArea;
   
-  features = [formFactor; elongatedness; convexity; solidity];
+  features = [formFactor, elongatedness, convexity, solidity];
   
 end
