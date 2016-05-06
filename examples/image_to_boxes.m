@@ -37,7 +37,7 @@ norm_bb = cat(1, norm_regions.BoundingBox);
 norm_bb = norm_bb(norm_large,:);
 
 for i = 1:size(norm_bb,1)
-  if ClassifyHands(GetFeatures(imcrop(bin_norm,norm_bb(i,:))))
+  if ClassifyHands(GetFeatures(imcrop(bin_norm,norm_bb(i,:))), 1:4)
     rectangle('position',norm_bb(i,:), 'edgecolor','g')
   else
     rectangle('position',norm_bb(i,:), 'edgecolor','r')
@@ -51,7 +51,7 @@ hsv_bb = cat(1, hsv_regions.BoundingBox);
 hsv_bb = hsv_bb(hsv_large,:);
 
 for i = 1:size(hsv_bb,1)
-  if ClassifyHands(GetFeatures(imcrop(bin_hsv,hsv_bb(i,:))))
+  if ClassifyHands(GetFeatures(imcrop(bin_hsv,hsv_bb(i,:))), 1:4)
     rectangle('position',hsv_bb(i,:), 'edgecolor','g')
   else
     rectangle('position',hsv_bb(i,:), 'edgecolor','r')
@@ -66,7 +66,7 @@ ycc_bb = cat(1, ycc_regions.BoundingBox);
 ycc_bb = ycc_bb(ycc_large,:);
 
 for i = 1:size(ycc_bb,1)
-  if ClassifyHands(GetFeatures(imcrop(bin_ycc,ycc_bb(i,:))))
+  if ClassifyHands(GetFeatures(imcrop(bin_ycc,ycc_bb(i,:))), 1:4)
     rectangle('position',ycc_bb(i,:), 'edgecolor','g')
   else
     rectangle('position',ycc_bb(i,:), 'edgecolor','r')
