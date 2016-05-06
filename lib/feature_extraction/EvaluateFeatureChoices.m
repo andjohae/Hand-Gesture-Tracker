@@ -23,7 +23,7 @@ function [errorRate, knownHandFeatures] = EvaluateFeatureChoices(imageDirPath,..
     
     % Get object features from image
     tmpFeatures = GetFeatures(img);
-    features(iFile,:) = tmpFeatures(selectedFeatures)';
+    features(iFile,:) = tmpFeatures(selectedFeatures);
   end
  
   % Estimate error rate from feature classification
