@@ -1,12 +1,12 @@
 addpath(genpath('./lib/'))
 
-I = imread('images/sequenceImages-05-02/im3.jpg');
+I = imread('images/image2.jpg');
 %I = imread('~/tmp/Hands/out.jpg');
 
 figure(1); clf
 imshow(I)
 
-se = strel('disk',6);
+se = strel('disk',4);
 
 figure(2); clf
 bin_norm = Rgb2Binary(I);
