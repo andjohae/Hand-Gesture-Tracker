@@ -4,7 +4,7 @@ function bin = Ycc2Binary(image)
 % YCbCr color format for [Cb; Cr].
 
 % Limits from "Summary of..."
-LIMITS = [77 127; 133 177];
+LIMITS = [77 120; 120 177];
 
 y = rgb2ycbcr(image);
 

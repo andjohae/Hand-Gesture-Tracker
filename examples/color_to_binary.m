@@ -1,31 +1,39 @@
 addpath(genpath('./lib/'))
 
-I = imread('images/handAndFaceImages/handAndFace3.jpg');
-%I = imread('~/tmp/Hands/out.jpg');
+%I = imread('images/images-04-26/shirt2.jpg');
+I = imread('images/image3.jpg');
 
-figure(1); clf
+fig1 = figure(1); clf
 imshow(I)
 
 I_hsv = rgb2hsv(I);
 I_ycc = rgb2ycbcr(I);
 
 I_norm = double(I);
+I_sqrt_sum = sqrt(sum(I_norm.^2,3));
+
 I_sum = sum(I,3);
 redNorm = I_norm(:,:,1) ./ I_sum;
 greenNorm = I_norm(:,:,2) ./ I_sum;
 blueNorm = I_norm(:,:,3) ./ I_sum;
 
-%-------------------------
-% RGB
+redNorm2 = I_norm(:,:,1) ./ I_sqrt_sum;
+greenNorm2 = I_norm(:,:,2) ./ I_sqrt_sum;
+blueNorm2 = I_norm(:,:,3) ./ I_sqrt_sum;
 
-figure(2); clf
+%-------------------------
+% RGB1
+
+fig2 = figure(2); clf
 subplot(2,3,1)
 imshow(redNorm)
+title('r')
 subplot(2,3,2)
 imshow(greenNorm)
-title('RGB')
+title('g')
 subplot(2,3,3)
 imshow(blueNorm)
+title('b')
 
 subplot(2,3,4)
 imhist(redNorm)
@@ -34,25 +42,43 @@ imhist(greenNorm)
 subplot(2,3,6)
 imhist(blueNorm)
 
+%-------------------------
+% RGB2
 
-bin_norm = Rgb2Binary(I);
-figure(3); clf
-imshow(bin_norm,[0 1])
-title('Norm Binary')
+fig3 = figure(3); clf
+subplot(2,3,1)
+imshow(redNorm2)
+title('x')
+subplot(2,3,2)
+imshow(greenNorm2)
+title('y')
+subplot(2,3,3)
+imshow(blueNorm2)
+title('z')
+
+subplot(2,3,4)
+imhist(redNorm2)
+subplot(2,3,5)
+imhist(greenNorm2)
+subplot(2,3,6)
+imhist(blueNorm2)
 
 
 %-------------------------
 % HSV
 
-figure(4); clf
+fig4 = figure(4); clf
 subplot(2,3,1)
 imshow(I_hsv(:,:,1))
+title('H')
 subplot(2,3,2)
 imshow(I_hsv(:,:,2))
-title('HSV')
+title('S')
 subplot(2,3,3)
 imshow(I_hsv(:,:,3))
-title('Not used')
+title('V')
+
+
 
 subplot(2,3,4)
 imhist(I_hsv(:,:,1))
@@ -62,22 +88,18 @@ subplot(2,3,6)
 imhist(I_hsv(:,:,3))
 
 
-bin_hsv = Hsv2Binary(I);
-figure(5); clf
-imshow(bin_hsv,[0 1])
-title('HSV Binary')
-
 %-------------------------
 
-figure(6); clf
+fig5 = figure(5); clf
 subplot(2,3,1)
 imshow(I_ycc(:,:,1))
-title('Not used')
+title('Y')
 subplot(2,3,2)
 imshow(I_ycc(:,:,2))
-title('YCC')
+title('Cb')
 subplot(2,3,3)
 imshow(I_ycc(:,:,3))
+title('Cr')
 
 subplot(2,3,4)
 imhist(I_ycc(:,:,1))
@@ -86,7 +108,44 @@ imhist(I_ycc(:,:,2))
 subplot(2,3,6)
 imhist(I_ycc(:,:,3))
 
+%--------------------------
+
+fig6 = figure(6); clf
+subplot(2,2,1)
+bin_norm = Rgb2Binary(I);
+imshow(bin_norm,[0 1])
+title('rgb')
+subplot(2,2,2)
+bin_norm2 = Rgb2Binary2(I);
+imshow(bin_norm2,[0 1])
+title('xyz')
+subplot(2,2,3)
+bin_hsv = Hsv2Binary(I);
+imshow(bin_hsv,[0 1])
+title('HSV')
+subplot(2,2,4)
 bin_ycc = Ycc2Binary(I);
-figure(7); clf
 imshow(bin_ycc,[0 1])
-title('YCC Binary')
+title('YCC')
+
+%%
+%-----------------------------
+
+figure(7); clf
+subplot(1,3,1)
+I_gray = Ycc2Gray(I);
+imshow(I_gray);
+subplot(1,3,2)
+hist(I_gray(:), 50);
+subplot(1,3,3)
+imshow(I_gray < LowerThreshold(I_gray));
+%imshow(I_gray < .4);
+
+%%
+
+print(fig1,'-depsc','~/tmp/figures/hand_ref')
+print(fig2,'-depsc','~/tmp/figures/dims_rgb1')
+print(fig3,'-depsc','~/tmp/figures/dims_rgb2')
+print(fig4,'-depsc','~/tmp/figures/dims_hsv')
+print(fig5,'-depsc','~/tmp/figures/dims_ycbcr')
+print(fig6,'-depsc','~/tmp/figures/binaries')
