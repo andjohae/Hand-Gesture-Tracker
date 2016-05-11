@@ -1,8 +1,7 @@
 function class = ClassifyHands(features, selectedFeatures)
-%   TODO: Choose classification method
+%   TODO: Choose classification method!
 %   Should return a logical row vector of size [size(features,1), 1]
   
-  % NOTE: Should the parameters be obtained as arguments?
   % Parameters
   meanFeatures = [0.000312738406930,...
                   3.209135856122326,...
@@ -22,7 +21,6 @@ function class = ClassifyHands(features, selectedFeatures)
   
   minFeatures = minFeatures(selectedFeatures);
   maxFeatures = maxFeatures(selectedFeatures);
-  features = features(:,selectedFeatures);
   nCases = size(features,1);
   
   % Classify hands
