@@ -1,6 +1,7 @@
 %% Backward selection
 clc;
 clear all;
+addpath('../lib/feature_extraction/');
 
 % Parameters
 imageDirPath = '../images/feature-eval-images/';
