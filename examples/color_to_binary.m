@@ -1,7 +1,9 @@
+%set(0,'DefaultFigureWindowStyle','docked')
 addpath(genpath('./lib/'))
 
+I = imread('images/handAndFaceImages/handAndFace3.jpg');
 %I = imread('images/images-04-26/shirt2.jpg');
-I = imread('images/image3.jpg');
+%I = imread('images/image3.jpg');
 
 fig1 = figure(1); clf
 imshow(I)
@@ -128,18 +130,18 @@ bin_ycc = Ycc2Binary(I);
 imshow(bin_ycc,[0 1])
 title('YCC')
 
-%%
+
 %-----------------------------
 
-figure(7); clf
-subplot(1,3,1)
+fig7 = figure(7); clf
+subplot(2,2,1)
 I_gray = Ycc2Gray(I);
 imshow(I_gray);
-subplot(1,3,2)
+subplot(2,2,3:4)
 hist(I_gray(:), 50);
-subplot(1,3,3)
-imshow(I_gray < LowerThreshold(I_gray));
-%imshow(I_gray < .4);
+subplot(2,2,2)
+%imshow(I_gray < LowerThreshold(I_gray));
+imshow(I_gray < .25);
 
 %%
 
@@ -149,3 +151,4 @@ print(fig3,'-depsc','~/tmp/figures/dims_rgb2')
 print(fig4,'-depsc','~/tmp/figures/dims_hsv')
 print(fig5,'-depsc','~/tmp/figures/dims_ycbcr')
 print(fig6,'-depsc','~/tmp/figures/binaries')
+print(fig7,'-depsc','~/tmp/figures/ycc_histogram')
