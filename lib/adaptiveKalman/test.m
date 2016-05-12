@@ -25,10 +25,15 @@ shg
 clf; clear all
 currAxes = axes;
 vidObj = VideoReader('testMov1.mov');
+trajectory = [NaN, NaN];
+kalmanTrajectory = [NaN, NaN];
+oldState = [758.4676;369.6482;0;0];
+oldEst = oldState;
+oldP = eye(4);% + [0.01 0.1 -0.09 0.03; 0.01 0.1 -0.09 0.03;0.01 0.1 -0.09 0.03;0.01 0.1 -0.09 0.03];
 
 while hasFrame(vidObj)
   
-  tic;
+  %tic;
   currentImage = readFrame(vidObj);
   binaryImage = ExtractSkinColor(currentImage);
   regions = regionprops(binaryImage);
@@ -36,30 +41,69 @@ while hasFrame(vidObj)
   centroids = cat(1,regions.Centroid);
   bBox = cat(1,regions.BoundingBox);
   x = centroids(sortedIdxs(1),1);
-  y = centroids(sortedIdxs(1),2);  
+  y = centroids(sortedIdxs(1),2);
+  oldState = [x;y;oldState(3);oldState(4)];
+  [oldState, oldEst, oldP] = PredictState(oldState, oldEst, oldP);
+  oldEst;
+  [x,y];
+  trajectory = [trajectory; x,y];
+  kalmanTrajectory = [kalmanTrajectory; oldEst(1),oldEst(2)];
  
   image(currentImage-0.004);
   hold on;
   plot(x,y,'r*')
+  plot(oldEst(1),oldEst(2),'go')
 
   currAxes.Visible = 'off';
   %pause(1/vidObj.FrameRate);
   pause(0.001);
   shg
-  toc
+  %toc
 
 end
 
+%%
+clf
+vidObj = VideoReader('testMov1.mov');
+currentImage = readFrame(vidObj);
+image(currentImage);
+hold on
+plot(trajectory(2:(end-15),1),trajectory(2:(end-15),2),'r')
+plot(kalmanTrajectory(2:(end-15),1),kalmanTrajectory(2:(end-15),2),'g')
+shg
+
 %% Using motions....
+
+clf
+currAxes = axes;
+vidObj = VideoReader('testMov1.mov');
+
+prevImage = readFrame(vidObj);
+newImage = readFrame(vidObj);
+binaryNewImage = ExtractSkinColor(newImage);
+regions = regionprops(binaryNewImage);
+imshow(newImage)
+hold on
+% [~, sortedIdxs] = sort(-[regions.Area]);
+% centroids = cat(1,regions.Centroid);
+% bBox = cat(1,regions.BoundingBox);
+% x = centroids(sortedIdxs(1),1);
+% y = centroids(sortedIdxs(1),2);
+% plot(x,y,'r*')
+% %rectangle('Position',bBox(sortedIdxs(1),:));
+% %ExtractMotion(prevImage,newImage);
+% shg
+
 while hasFrame(vidObj)
   
   binaryPrevImage = ExtractSkinColor(prevImage);
+  curImage = readFrame(vidObj);
   curImage = readFrame(vidObj);
   binaryCurImage = ExtractSkinColor(curImage);
   motionImage = ExtractMotion(prevImage, curImage);
   combinedImage = (binaryCurImage & motionImage) | (binaryPrevImage & motionImage);
   [x,y,w,h] = ComputeRegionOfInterest(combinedImage);
-  imshow(curImage);
+  imshow(combinedImage);
   hold on;
 
   if(x ~= -1)
