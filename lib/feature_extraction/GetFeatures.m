@@ -11,7 +11,7 @@ function features = GetFeatures(binaryImg)
 %           Convexity     = Convex perimeter / Perimeter
 %           Solidity      = Area / Convex area
 %
-% Note that all features are size independent.
+% Note that all features are size invariant.
   
   % Initialization
   structuralElement = strel('square',3);
@@ -20,19 +20,19 @@ function features = GetFeatures(binaryImg)
   
   % Object perimeter
   perimeterImg = binaryImg - imerode(binaryImg, structuralElement); 
-  perimeter = length( find( perimeterImg ) );
+  perimeter = sum(perimeterImg(:));
     
   % Object area
   filledImg = imfill(perimeterImg);
-  area = length( find( filledImg ) );
+  area = sum(filledImg(:));
     
   % Convex area
   convexHullImg = bwconvhull( filledImg );
-  convexArea = length( find( convexHullImg ) );
+  convexArea = sum(convexHullImg(:));
   
   % Convex perimeter
   convexPerimeterImg = convexHullImg - imerode(convexHullImg,structuralElement);
-  convexPerimeter = length( find( convexPerimeterImg ) );
+  convexPerimeter = sum(convexPerimeterImg(:));
   
   % Thickness
   tmpImg = binaryImg;
@@ -47,7 +47,12 @@ function features = GetFeatures(binaryImg)
   elongatedness = area / (thickness^2);
   convexity = convexPerimeter / perimeter;
   solidity = area / convexArea;
+
+  % Calculate moments
+  areaMoments = GetMoments(binaryImg);
+%   perimeterMoments = GetMoments(perimeterImg); % No significant new info?
   
-  features = [formFactor, elongatedness, convexity, solidity];
+  features = [formFactor, elongatedness, convexity, solidity,...
+              areaMoments];
   
 end
