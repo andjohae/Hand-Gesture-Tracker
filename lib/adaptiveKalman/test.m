@@ -84,20 +84,11 @@ binaryNewImage = ExtractSkinColor(newImage);
 regions = regionprops(binaryNewImage);
 imshow(newImage)
 hold on
-% [~, sortedIdxs] = sort(-[regions.Area]);
-% centroids = cat(1,regions.Centroid);
-% bBox = cat(1,regions.BoundingBox);
-% x = centroids(sortedIdxs(1),1);
-% y = centroids(sortedIdxs(1),2);
-% plot(x,y,'r*')
-% %rectangle('Position',bBox(sortedIdxs(1),:));
-% %ExtractMotion(prevImage,newImage);
-% shg
+
 
 while hasFrame(vidObj)
   
   binaryPrevImage = ExtractSkinColor(prevImage);
-  curImage = readFrame(vidObj);
   curImage = readFrame(vidObj);
   binaryCurImage = ExtractSkinColor(curImage);
   motionImage = ExtractMotion(prevImage, curImage);
@@ -107,7 +98,7 @@ while hasFrame(vidObj)
   hold on;
 
   if(x ~= -1)
-    rectangle('Position',[x,y,w,h]);
+    plot(x+w/2,y+h/2,'r*');
   end
 
   currAxes.Visible = 'off';

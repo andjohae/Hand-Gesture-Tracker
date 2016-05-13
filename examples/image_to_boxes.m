@@ -1,4 +1,5 @@
-addpath(genpath('./lib/'))
+addpath(genpath('./../lib/'))
+addpath(genpath('./../images/'))
 
 I = imread('images/image2.jpg');
 %I = imread('~/tmp/Hands/out.jpg');

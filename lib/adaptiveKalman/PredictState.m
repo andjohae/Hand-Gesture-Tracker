@@ -26,32 +26,42 @@ function [statePrediction, estimatePrediction, covariancePrediction] = ...
   H = [1 0 0 0;
        0 1 0 0];
      
-  % TODO: IS ACTUALLY BROWNIAN MOTION!
-  statePrediction = A*currentState + 0.01*randi([-1,1]);
-  
-  measurementNoise = 0; % Is really the difference between true and estimate.
-  z = H*statePrediction + measurementNoise;
-  xHatMinus = A*currentEstimate;
-  
-  % Determining the acceleration and w* coefficients.
-  ax = (statePrediction(3) - currentState(3))/dt;
-  ay = (statePrediction(4) - currentState(4))/dt;
+     
+     
   wR = 7.5/T_a;
   wQ = 0.25/T_a;
-  if T_a < ax || T_a < ay
-    wR = 7.5/T-a^2;
-    wQ = 0.57/T_a;
-  end
-  
   % Process noise covariance
   Q = wQ.*eye(4);
   
-  % Priori Covariance estimates
-  PMinus = A*P + Q; 
-  
-  % Measuremant noise covariance
+  % Observation noise covariance
   f = 0.1845; % Constant from article.. TODO: Check this further.
   R = wR.*[f f/40;f/40 f/4];
+     
+  % TODO: IS ACTUALLY BROWNIAN MOTION! - Maybe not..
+  statePrediction = A*currentState + mvnrnd([0 0 0 0],Q)';
+  
+  observationNoise = mvnrnd([0 0],R)'; % Is really the difference between true and estimate.
+  z = H*statePrediction + observationNoise;
+  xHatMinus = A*currentEstimate;
+  
+  % TODO: IMPLEMENT THIS PART! IS CURRENTLY NOT AN ADAPTIVE FILTER!!
+  % Determining the acceleration and w* coefficients.
+  ax = (statePrediction(3) - currentState(3))/dt;
+  ay = (statePrediction(4) - currentState(4))/dt;
+  
+  if T_a < abs(ax) || T_a < abs(ay)
+    wR = 7.5/T_a^2;
+    wQ = 0.75/T_a;
+    %display('w* update triggered')
+  else
+    %display('w* not update triggered')
+  end
+  R = wR.*[f f/40;f/40 f/4];
+  Q = wQ.*eye(4);
+  
+  % Priori Covariance estimates
+  PMinus = A*P*A' + Q; 
+  
   
   % Kalman gain
   K = PMinus*H'*inv(H*PMinus*H' + R);
