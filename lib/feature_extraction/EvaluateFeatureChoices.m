@@ -1,5 +1,4 @@
-function [errorRate, knownHandFeatures] = EvaluateFeatureChoices(imageDirPath,...
-    selectedFeatures)
+function errorRate = EvaluateFeatureChoices(imageDirPath, selectedFeatures)
 % Assumptions: Unix system, binary image with a single isolated object, ...
 % TODO: Help text
   
@@ -21,16 +20,16 @@ function [errorRate, knownHandFeatures] = EvaluateFeatureChoices(imageDirPath,..
     filename = strcat(imageDirPath, files(iFile).name);
     img = imread(filename);
     
+    % Convert to binary
+    binaryImg = logical(img);
+    
     % Get object features from image
-    tmpFeatures = GetFeatures(img);
+    tmpFeatures = GetFeatures(binaryImg);
     features(iFile,:) = tmpFeatures(selectedFeatures);
   end
  
   % Estimate error rate from feature classification
   isWrongClass = ClassifyHands(features, selectedFeatures) ~= key;
   errorRate = sum(isWrongClass) / nFiles;
-
-  % Return features of known hands --- Temporary
-  knownHandFeatures = features(logical(key),:);
   
 end
