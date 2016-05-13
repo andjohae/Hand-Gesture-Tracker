@@ -39,7 +39,6 @@ end
 
 % Store last remaining feature and calculate its error rate
 selectedFeatures(1) = availableFeatures; 
-bestErrorRates(1) = EvaluateFeatureChoices(imageDirPath, availableFeatures);
 
 % Print results
 fprintf('\n');
