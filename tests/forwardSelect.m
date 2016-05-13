@@ -6,7 +6,8 @@ addpath('../lib/feature_extraction/');
 % Parameters
 imageDirPath = '../images/feature-eval-images/';
 features = {'Formfactor','Elongatedness','Convexity','Solidity',...
-            'Area moment 1','Area moment 2','Area moment 3','Area moment 4'};
+            'Area moment 1','Area moment 2','Area moment 3',...
+            'Area moment 4','Area moment 5','Area moment 6'};
 
 % Initialization
 nTotalFeatures = size(features,2);
@@ -53,12 +54,12 @@ title('Classification rates from forward selection',...
     'Interpreter','Latex','FontSize',16);
 ylabel('Classification rate','Interpreter','Latex','FontSize',14);
 xlabel('Number of features used','Interpreter','Latex','FontSize',14);
-axis([0.5 8.5 0.75 1.1]);
+axis([0.5 10.5 0.75 1.1]);
 
 % Add list of features in order of addition
 annotationStringForward = cell(nTotalFeatures,1);
 for i = 1:nTotalFeatures
   annotationStringForward(i) = strcat(sprintf('(%d) ',i),features(selectedFeatures(i)));
 end
-h_an1 = annotation('textbox', [0.2 0.17 0.27 0.38],'BackgroundColor',[1 1 1],...
+h_an1 = annotation('textbox', [0.2 0.17 0.27 0.47],'BackgroundColor',[1 1 1],...
     'String',annotationStringForward,'Interpreter','Latex','FontSize',12);

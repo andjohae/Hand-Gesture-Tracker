@@ -12,24 +12,29 @@ function moments = GetMoments(binaryImage)
   integrand = @(p,q) (X - meanX).^p .* (Y - meanY).^q .* binaryImage;
 
   % Compute central moments - translation and scaling invariant
-  centralMoment_11 = sum(sum( integrand(1,1) ));
-  centralMoment_20 = sum(sum( integrand(2,0) ));
-  centralMoment_02 = sum(sum( integrand(0,2) ));
-  centralMoment_30 = sum(sum( integrand(3,0) ));
-  centralMoment_21 = sum(sum( integrand(2,1) ));
-  centralMoment_12 = sum(sum( integrand(1,2) ));
-  centralMoment_03 = sum(sum( integrand(0,3) ));
+  cm_11 = sum(sum( integrand(1,1) ));
+  cm_20 = sum(sum( integrand(2,0) ));
+  cm_02 = sum(sum( integrand(0,2) ));
+  cm_30 = sum(sum( integrand(3,0) ));
+  cm_21 = sum(sum( integrand(2,1) ));
+  cm_12 = sum(sum( integrand(1,2) ));
+  cm_03 = sum(sum( integrand(0,3) ));
   
-  % Moment invariants - rotation (and mirror?) invariant
-  moments = zeros(1,4);
-  moments(1) = centralMoment_20 + centralMoment_02;
-  moments(2) = (centralMoment_20 - centralMoment_02)^2 + 4*centralMoment_11^2;
-  moments(3) = (centralMoment_30 - 3*centralMoment_12)^2 + ...
-               (centralMoment_03 - 3*centralMoment_21)^2;
-  moments(4) = (centralMoment_30 + centralMoment_12)^2 + ...
-               (centralMoment_03 + centralMoment_21)^2;
-   
+  % Moment invariants - rotation and mirror invariant
+  moments = zeros(1,6);
+  moments(1) = cm_20 + cm_02;
+  moments(2) = (cm_20 - cm_02)^2 + 4*cm_11^2;
+  moments(3) = (cm_30 - 3*cm_12)^2 + (cm_03 - 3*cm_21)^2;
+  moments(4) = (cm_30 + cm_12)^2 + (cm_03 + cm_21)^2;
+ 
+  moments(5) = (cm_30 - 3*cm_12)*(cm_30 + cm_12) * ((cm_30 + cm_12)^2 - ...
+      3*(cm_21 + cm_03)^2) + (3*cm_21 - cm_03)*(cm_21 + cm_03) * ...
+      ( 3*(cm_30 + cm_12)^2 - (cm_21 + cm_03)^2 );
+  
+  moments(6) = (cm_20 - cm_02) * ( (cm_30 + cm_12)^2 - (cm_21 + cm_03)^2 ) ...
+      + 4 * cm_11 * (cm_30 + cm_12) * (cm_21 + cm_03);
+    
   % Use natural logarithm of moments to achieve numerical stability
-  moments = log(moments);
+  moments = log(moments(1:6));
   
 end

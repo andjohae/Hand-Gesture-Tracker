@@ -6,7 +6,8 @@ addpath('../lib/feature_extraction/');
 % Parameters
 imageDirPath = '../images/feature-eval-images/';
 features = {'Formfactor','Elongatedness','Convexity','Solidity',...
-            'Area moment 1','Area moment 2','Area moment 3','Area moment 4'};
+            'Area moment 1','Area moment 2','Area moment 3',...
+            'Area moment 4','Area moment 5','Area moment 6'};
 
 % Initialization
 nTotalFeatures = size(features,2);
@@ -15,7 +16,7 @@ selectedFeatures = zeros(nTotalFeatures,1);
 availableFeatures = 1:nTotalFeatures;
 
 % Calculate error rate for all features used
-bestErrorRates(nTotalFeatures) = EvaluateFeatureChoices(imageDirPath, 1:nTotalFeatures);
+bestErrorRates(nTotalFeatures) = EvaluateFeatureChoices(imageDirPath, availableFeatures);
 
 % Main loop
 for iNumFeaturesUsed = nTotalFeatures-1:-1:1
@@ -24,7 +25,7 @@ for iNumFeaturesUsed = nTotalFeatures-1:-1:1
   nAvailableFeatures = length(availableFeatures);
   errorRates = zeros(nAvailableFeatures, 1);
   
-  % Loop over additional features
+  % Loop over removed features
   for iFeature = 1:nAvailableFeatures
     tmpSelected = [availableFeatures(1:iFeature-1), availableFeatures(iFeature+1:end)];
     errorRates(iFeature) = EvaluateFeatureChoices(imageDirPath, tmpSelected);
@@ -55,7 +56,7 @@ clf(h_fig2);
 h_backPlot = plot(1:nTotalFeatures, 1-bestErrorRates,'bo-');
 
 set(gca,'XTick',1:nTotalFeatures);
-axis([0.5 8.5 0.75 1.05]);
+axis([0.5 10.5 0.75 1.05]);
 box on;
 
 title('Classification rates from backward selection',...
