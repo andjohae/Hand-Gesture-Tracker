@@ -22,9 +22,12 @@ shg
 
 %% Using only regions....
 
+addpath(genpath('./../../images'))
+addpath(genpath('./../'))
+
 clf; clear all
 currAxes = axes;
-vidObj = VideoReader('testMov1.mov');
+vidObj = VideoReader('whiteBackVid_3.mov');
 trajectory = [NaN, NaN];
 kalmanTrajectory = [NaN, NaN];
 oldState = [758.4676;369.6482;0;0];
@@ -35,7 +38,8 @@ while hasFrame(vidObj)
   
   %tic;
   currentImage = readFrame(vidObj);
-  binaryImage = ExtractSkinColor(currentImage);
+  binaryImage = Ycc2Binary(currentImage);
+  %binaryImage = ExtractSkinColor(currentImage);
   regions = regionprops(binaryImage);
   [~, sortedIdxs] = sort(-[regions.Area]);
   centroids = cat(1,regions.Centroid);
@@ -49,7 +53,7 @@ while hasFrame(vidObj)
   trajectory = [trajectory; x,y];
   kalmanTrajectory = [kalmanTrajectory; oldEst(1),oldEst(2)];
  
-  image(currentImage-0.004);
+  imshow(binaryImage);
   hold on;
   plot(x,y,'r*')
   plot(oldEst(1),oldEst(2),'go')
@@ -57,14 +61,14 @@ while hasFrame(vidObj)
   currAxes.Visible = 'off';
   %pause(1/vidObj.FrameRate);
   pause(0.001);
-  shg
+  shg,
   %toc
 
 end
 
 %%
 clf
-vidObj = VideoReader('testMov1.mov');
+vidObj = VideoReader('whiteBackVid_3.mov');
 currentImage = readFrame(vidObj);
 image(currentImage);
 hold on
@@ -76,7 +80,7 @@ shg
 
 clf
 currAxes = axes;
-vidObj = VideoReader('testMov1.mov');
+vidObj = VideoReader('whiteBackVid_1.mov');
 
 prevImage = readFrame(vidObj);
 newImage = readFrame(vidObj);
@@ -90,7 +94,7 @@ while hasFrame(vidObj)
   
   binaryPrevImage = ExtractSkinColor(prevImage);
   curImage = readFrame(vidObj);
-  binaryCurImage = ExtractSkinColor(curImage);
+  binaryCurImage = Ycc2Binary(curImage);
   motionImage = ExtractMotion(prevImage, curImage);
   combinedImage = (binaryCurImage & motionImage) | (binaryPrevImage & motionImage);
   [x,y,w,h] = ComputeRegionOfInterest(combinedImage);
