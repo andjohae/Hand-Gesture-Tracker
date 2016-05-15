@@ -1,7 +1,8 @@
-% Computing center of mass..
+% Computing center of mass of binaryImage
 function center = ComputeCenterOfMass(binaryImage)
 
-[y, x] = find( binaryImage );
-center = [mean(x), mean(y)];
-
+  idxs = find(binaryImage);
+  idxs = sum(idxs)/length(idxs);
+  center = [idxs/size(binaryImage,1),idxs/size(binaryImage,2)];
+  
 end

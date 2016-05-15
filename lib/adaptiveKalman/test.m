@@ -46,8 +46,8 @@ while hasFrame(vidObj)
   bBox = cat(1,regions.BoundingBox);
   x = centroids(sortedIdxs(1),1);
   y = centroids(sortedIdxs(1),2);
-  oldState = [x;y;oldState(3);oldState(4)];
   [oldState, oldEst, oldP] = PredictState(oldState, oldEst, oldP);
+  oldState = [x;y;oldState(3);oldState(4)];
   oldEst;
   [x,y];
   trajectory = [trajectory; x,y];
