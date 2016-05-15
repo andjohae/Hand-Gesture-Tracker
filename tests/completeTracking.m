@@ -48,7 +48,7 @@ handCenter = centroids(sortedIdxs(1),:);
 % Chosing an appropriate cropping box for efficient tracking.
 side = min(handRegion(3),handRegion(4));
 handRegion(3) = side; handRegion(4) = side;
-binaryImage = imcrop(currentBinaryImage, handRegion);
+%binaryImage = imcrop(currentBinaryImage, handRegion);
 
 % Initializing the trajectory tracking.
 trajectory = [NaN, NaN; handCenter(1), handCenter(2)];
@@ -60,45 +60,45 @@ estimate = state;
 P = zeros(4);
 
 
-imshow(binaryImage)
-shg
-
 while hasFrame(vidObj)
   
   %tic;
-  center = ComputeCenterOfMass(binaryImage);
-  %handRegion = FindBoundingBox(videoDims, handRegion);
-  handRegion(1) = handRegion(1) + x-state(1);
-  handRegion(2) = handRegion(2) + state(4);
-  x = center(1) + handRegion(1); y = center(2) + handRegion(2);
-  state = [x; y; x-state(1); y-state(2)];
+  currentImage = readFrame(vidObj);
+  binaryImage = Ycc2Binary(currentImage);
+  regions = regionprops(binaryImage);
+  [~, sortedIdxs] = sort(-[regions.Area]);
+  centroids = cat(1,regions.Centroid);
+  x = centroids(sortedIdxs(1),1);
+  y = centroids(sortedIdxs(1),2);
+  state = [x;y;state(1)-x;state(2)-y];
+  
+  if(state(3) > 90 || state(4) > 90)
+    break;
+  end
   
   [~, estimate, P] = PredictState(state, estimate, P);
   trajectory = [trajectory; x,y];
   kalmanTrajectory = [kalmanTrajectory; estimate(1),estimate(2)];
-  estimate
-  imshow(binaryImage)
+ 
+  image(currentImage);
   hold on;
-  plot(handRegion(3)/2,handRegion(4)/2,'r*');
-  %plot(estimate(1)-center(2),estimate(2)-center(1),'go');
-%   image(currentImage);
-%   hold on;
-%   rectangle('position',handRegion);
-%   plot(x,y,'r*')
-%   plot(estimate(1),estimate(2),'go')
-%   legend('Normal','Adaptive Kalman');
+  plot(x,y,'r*')
+  plot(estimate(1),estimate(2),'go')
+  legend('Normal','Adaptive Kalman');
 
-  %currAxes.Visible = 'off';
+  currAxes.Visible = 'off';
   pause(1/vidObj.FrameRate);
-  
-  currentImage = readFrame(vidObj);
-  %handRegion = FindBoundingBox(videoDims, side, [x;y]);
-  %handRegion = [estimate(1)-side/2,estimate(2)-side/2,side,side];
-  %handRegion = FindBoundingBox(videoDims, side, estimate(1:2)');
-  currentCroppedImage = imcrop(currentImage, handRegion);
-  binaryImage = Ycc2Binary(currentCroppedImage);
-  binaryImage = bwareaopen(binaryImage, 40);
   shg
   %toc
-
 end
+
+%%
+
+clf;
+vidObj = VideoReader('whiteBackVid_1.mov');
+currentImage = readFrame(vidObj);
+imshow(currentImage);
+hold on 
+plot(trajectory(:,1),trajectory(:,2),'r')
+plot(kalmanTrajectory(:,1),kalmanTrajectory(:,2),'g')
+shg
