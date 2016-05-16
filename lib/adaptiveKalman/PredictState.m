@@ -12,7 +12,7 @@ function [statePrediction, estimatePrediction, covariancePrediction] = ...
   PredictState(currentState, currentEstimate, currentCovariance)
 
   % Temporary acceleration threshold
-  T_a = 1;
+  T_a = 0.75;
 
   P = currentCovariance;
   % State transition matrix

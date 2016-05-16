@@ -7,7 +7,8 @@ addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-vidObj = VideoReader('whiteBackVid_1.mov');
+movie = 'whiteBackVid_2.mov';
+vidObj = VideoReader(movie);
 
 % Obtaining the first frame of the movie 
 % and detects the most likely region to contain a hand.
@@ -31,7 +32,7 @@ for i = 1:length(areas)
     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
     selectedFeatures = [1 2 3 6 7]; % Example
     features = GetFeatures(binaryImage);
-    class = ClassifyHands(features(selectedFeatures),selectedFeatures);
+    class = ClassifyHands(features(selectedFeatures),selectedFeatures)
     if(class == 1) % If hand is found - save location and break.
       handRegion = bBox(i,:);
       handCenter = centroids(i,:);
@@ -59,46 +60,54 @@ state = [handCenter(1); handCenter(2);0;0];
 estimate = state;
 P = zeros(4);
 
-
 while hasFrame(vidObj)
   
-  %tic;
-  currentImage = readFrame(vidObj);
-  binaryImage = Ycc2Binary(currentImage);
-  regions = regionprops(binaryImage);
-  [~, sortedIdxs] = sort(-[regions.Area]);
-  centroids = cat(1,regions.Centroid);
-  x = centroids(sortedIdxs(1),1);
-  y = centroids(sortedIdxs(1),2);
-  state = [x;y;state(1)-x;state(2)-y];
   
-  if(state(3) > 90 || state(4) > 90)
-    break;
-  end
+  xPrevCenter = handRegion(1) + handRegion(3)/2;
+  yPrevCenter = handRegion(2) + handRegion(4)/2;
+
+  tic
+  currentImage = readFrame(vidObj);
+  toc
+  binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
+  
+  center = ComputeCenterOfMass(binaryImage);
+  
+  xNewCenter = handRegion(1) + center(1);
+  yNewCenter = handRegion(2) + center(2);
+  handRegion(1) = handRegion(1) + xNewCenter - xPrevCenter;
+  handRegion(2) = handRegion(2) + yNewCenter - yPrevCenter;
+  
+  state = [xNewCenter;yNewCenter; ...
+           xNewCenter - xPrevCenter;yNewCenter - yPrevCenter];
+  
   
   [~, estimate, P] = PredictState(state, estimate, P);
-  trajectory = [trajectory; x,y];
+  trajectory = [trajectory; xNewCenter,yNewCenter];
   kalmanTrajectory = [kalmanTrajectory; estimate(1),estimate(2)];
+  
  
   image(currentImage);
   hold on;
-  plot(x,y,'r*')
+  plot(xNewCenter,yNewCenter,'r*')
   plot(estimate(1),estimate(2),'go')
   legend('Normal','Adaptive Kalman');
 
   currAxes.Visible = 'off';
   pause(1/vidObj.FrameRate);
   shg
-  %toc
+  
 end
 
 %%
 
 clf;
-vidObj = VideoReader('whiteBackVid_1.mov');
+vidObj = VideoReader(movie);
 currentImage = readFrame(vidObj);
 imshow(currentImage);
 hold on 
 plot(trajectory(:,1),trajectory(:,2),'r')
 plot(kalmanTrajectory(:,1),kalmanTrajectory(:,2),'g')
 shg
+
+%%
