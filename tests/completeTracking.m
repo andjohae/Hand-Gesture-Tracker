@@ -7,13 +7,13 @@ addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-movie = 'whiteBackVid_2.mov';
+movie = 'tVid.mov';
 vidObj = VideoReader(movie);
 
 % Obtaining the first frame of the movie 
 % and detects the most likely region to contain a hand.
 currentImage = readFrame(vidObj);
-currentBinaryImage = Ycc2Binary(currentImage);
+currentBinaryImage = Ycc2Binary(currentImage);% & Ycc2Binary(currentImage);
 videoDims = size(currentBinaryImage);
 
 % Extracting regions.
@@ -66,9 +66,7 @@ while hasFrame(vidObj)
   xPrevCenter = handRegion(1) + handRegion(3)/2;
   yPrevCenter = handRegion(2) + handRegion(4)/2;
 
-  tic
   currentImage = readFrame(vidObj);
-  toc
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
   
   center = ComputeCenterOfMass(binaryImage);
@@ -91,6 +89,7 @@ while hasFrame(vidObj)
   hold on;
   plot(xNewCenter,yNewCenter,'r*')
   plot(estimate(1),estimate(2),'go')
+  rectangle('position', handRegion);
   legend('Normal','Adaptive Kalman');
 
   currAxes.Visible = 'off';
@@ -108,6 +107,8 @@ imshow(currentImage);
 hold on 
 plot(trajectory(:,1),trajectory(:,2),'r')
 plot(kalmanTrajectory(:,1),kalmanTrajectory(:,2),'g')
+leg = legend('Measured trajectory','Kalman trajectory')
+set(leg,'interpreter', 'latex')
 shg
 
 %%

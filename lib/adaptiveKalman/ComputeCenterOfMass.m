@@ -1,4 +1,6 @@
-% Computing center of mass of binaryImage
+% Computing center of mass of binaryImage. Code borrowed from
+% http://se.mathworks.com/matlabcentral/answers/155558-center-of-mass-of-binary-image
+% date: 2016-05-16
 function center = ComputeCenterOfMass(binaryImage)
 
   img = binaryImage;
