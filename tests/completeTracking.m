@@ -7,21 +7,25 @@ addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-movie = 'tVid.mov';
+movie = 'zVid_2.mov';
 vidObj = VideoReader(movie);
 
 % Obtaining the first frame of the movie 
 % and detects the most likely region to contain a hand.
+
 currentImage = readFrame(vidObj);
 currentBinaryImage = Ycc2Binary(currentImage);% & Ycc2Binary(currentImage);
 videoDims = size(currentBinaryImage);
 
 % Extracting regions.
+
+tic
 regions = regionprops(currentBinaryImage);
 [~, sortedIdxs] = sort(-[regions.Area]);
 centroids = cat(1,regions.Centroid);
 bBox = cat(1,regions.BoundingBox);
 areas = cat(1,regions.Area);
+toc
 
 % Finding hand region. (Do not consider small regions Area < 500)
 % CURRENTLY NOT CLASSIFYING ANY HAND!
@@ -42,8 +46,8 @@ for i = 1:length(areas)
 end
 
 % Temporarily choosing the largest region.
-handRegion = bBox(sortedIdxs(1),:);
-handCenter = centroids(sortedIdxs(1),:);
+handRegion = bBox(sortedIdxs(2),:);
+handCenter = centroids(sortedIdxs(2),:);
 
 
 % Chosing an appropriate cropping box for efficient tracking.
@@ -60,23 +64,24 @@ state = [handCenter(1); handCenter(2);0;0];
 estimate = state;
 P = zeros(4);
 
+
 while hasFrame(vidObj)
   
   
   xPrevCenter = handRegion(1) + handRegion(3)/2;
   yPrevCenter = handRegion(2) + handRegion(4)/2;
-
   currentImage = readFrame(vidObj);
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
   
+  tic
   center = ComputeCenterOfMass(binaryImage);
-  
+  toc
   xNewCenter = handRegion(1) + center(1);
   yNewCenter = handRegion(2) + center(2);
   handRegion(1) = handRegion(1) + xNewCenter - xPrevCenter;
   handRegion(2) = handRegion(2) + yNewCenter - yPrevCenter;
   
-  state = [xNewCenter;yNewCenter; ...
+  state = [xNewCenter; yNewCenter; ...
            xNewCenter - xPrevCenter;yNewCenter - yPrevCenter];
   
   
@@ -84,7 +89,6 @@ while hasFrame(vidObj)
   trajectory = [trajectory; xNewCenter,yNewCenter];
   kalmanTrajectory = [kalmanTrajectory; estimate(1),estimate(2)];
   
- 
   image(currentImage);
   hold on;
   plot(xNewCenter,yNewCenter,'r*')
