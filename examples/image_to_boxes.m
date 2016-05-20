@@ -2,34 +2,21 @@ addpath(genpath('./lib/'))
 addpath(genpath('./images/'))
 
 %I = imread('images/image3.jpg');
-I = imread('images/handAndFaceImages/handAndFace3.jpg');
+I = imread('images/sequenceImages-05-02/im3.jpg');
+%I = imread('images/handAndFaceImages/handAndFace3.jpg');
 
 figure(1); clf
 imshow(I)
 
 se = strel('disk',4);
 
-figure(2); clf
-bin_norm = Rgb2Binary(I);
-bin_norm = imopen(bin_norm, se);
-imshow(bin_norm);
-title('Normalized')
-
-figure(3); clf
-bin_hsv = Hsv2Binary(I);
-bin_hsv = imclose(bin_hsv, se);
-imshow(bin_hsv);
-title('HSV')
-
 figure(4); clf
 bin_ycc = Ycc2Binary(I);
 bin_ycc = imopen(bin_ycc, se);
-
-
 imshow(bin_ycc);
 title('YCC')
 
-feature_choice = [1, 5];
+feature_choice = [3:4];
 
 % YCC
 figure(4); hold on
@@ -49,13 +36,21 @@ end
 
 [featureMin;...
 GetFeatures(imcrop(bin_ycc,ycc_bb(1,:)));...
-GetFeatures(imcrop(bin_ycc,ycc_bb(2,:)));...
-GetFeatures(imcrop(bin_ycc,ycc_bb(3,:)));...
-GetFeatures(imcrop(bin_ycc,ycc_bb(4,:)));...
-GetFeatures(imcrop(bin_ycc,ycc_bb(5,:)));...
 featureMax]
 
 %%
+
+figure(2); clf
+bin_norm = Rgb2Binary(I);
+bin_norm = imopen(bin_norm, se);
+imshow(bin_norm);
+title('Normalized')
+
+figure(3); clf
+bin_hsv = Hsv2Binary(I);
+bin_hsv = imclose(bin_hsv, se);
+imshow(bin_hsv);
+title('HSV')
 
 % NORMALIZED
 figure(2); hold on
