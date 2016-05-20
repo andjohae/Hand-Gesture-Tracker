@@ -16,6 +16,12 @@ function features = GetFeatures(binaryImg)
   %%%%% Initialization %%%%%
   structuralElement = strel('square',3);
   
+  % Check image validity
+  if ~islogical(binaryImg)
+    disp('Converting image to binary format for feature extraction\n');
+    binaryImg = im2bw(binaryImg);
+  end
+  
   %%%% Clean up %%%%%
   filledImg = imfill(binaryImg, 'holes');
   img = padarray(filledImg, [1, 1]);
