@@ -2,12 +2,12 @@
 % region and use the ComputeCenterOfMass-function to efficiently locate
 % the region of interest. 
 
-clf; clear all
+clf;
 addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-movie = 'zVid_2.mov';
+movie = 'testMov1.mov';
 vidObj = VideoReader(movie);
 
 % Obtaining the first frame of the movie 
@@ -30,7 +30,7 @@ toc
 % Finding hand region. (Do not consider small regions Area < 500)
 % CURRENTLY NOT CLASSIFYING ANY HAND!
 handCenter = [0, 0];
-handRegion = [0,0,0,0];
+handRegion = [0, 0, 0, 0];
 for i = 1:length(areas)
   if(areas(i) >= 500)
     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
@@ -46,8 +46,8 @@ for i = 1:length(areas)
 end
 
 % Temporarily choosing the largest region.
-handRegion = bBox(sortedIdxs(2),:);
-handCenter = centroids(sortedIdxs(2),:);
+handRegion = bBox(sortedIdxs(1),:);
+handCenter = centroids(sortedIdxs(1),:);
 
 
 % Chosing an appropriate cropping box for efficient tracking.
@@ -64,18 +64,25 @@ state = [handCenter(1); handCenter(2);0;0];
 estimate = state;
 P = zeros(4);
 
+%%
+movieCell = {}; iter = 1;
+while hasFrame(vidObj)  
+  movieCell{iter} = readFrame(vidObj);
+  iter = iter + 1
+end
+%%
 
-while hasFrame(vidObj)
+for i = 1:iter
+%while hasFrame(vidObj)  
   
-  
+  tic;
   xPrevCenter = handRegion(1) + handRegion(3)/2;
   yPrevCenter = handRegion(2) + handRegion(4)/2;
-  currentImage = readFrame(vidObj);
+  %currentImage = readFrame(vidObj);
+  currentImage = movieCell{i};
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
   
-  tic
   center = ComputeCenterOfMass(binaryImage);
-  toc
   xNewCenter = handRegion(1) + center(1);
   yNewCenter = handRegion(2) + center(2);
   handRegion(1) = handRegion(1) + xNewCenter - xPrevCenter;
@@ -95,9 +102,10 @@ while hasFrame(vidObj)
   plot(estimate(1),estimate(2),'go')
   rectangle('position', handRegion);
   legend('Normal','Adaptive Kalman');
-
+  t = toc;
   currAxes.Visible = 'off';
-  pause(1/vidObj.FrameRate);
+  pause(max(1/vidObj.FrameRate-t,0));
+  drawnow
   shg
   
 end
