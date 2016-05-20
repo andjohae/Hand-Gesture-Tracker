@@ -1,8 +1,8 @@
-addpath(genpath('./../lib/'))
-addpath(genpath('./../images/'))
+addpath(genpath('./lib/'))
+addpath(genpath('./images/'))
 
-I = imread('images/image1.jpg');
-%I = imread('~/tmp/Hands/out.jpg');
+%I = imread('images/image3.jpg');
+I = imread('images/handAndFaceImages/handAndFace3.jpg');
 
 figure(1); clf
 imshow(I)
@@ -29,7 +29,7 @@ bin_ycc = imopen(bin_ycc, se);
 imshow(bin_ycc);
 title('YCC')
 
-feature_choice = [5];
+feature_choice = [1, 5, 6, 7];
 
 
 % NORMALIZED
@@ -80,3 +80,11 @@ for i = 1:size(ycc_bb,1)
     rectangle('position',ycc_bb(i,:), 'edgecolor','r')
   end
 end
+
+[featureMin;...
+GetFeatures(imcrop(bin_ycc,ycc_bb(1,:)));...
+GetFeatures(imcrop(bin_ycc,ycc_bb(2,:)));...
+GetFeatures(imcrop(bin_ycc,ycc_bb(3,:)));...
+GetFeatures(imcrop(bin_ycc,ycc_bb(4,:)));...
+GetFeatures(imcrop(bin_ycc,ycc_bb(5,:)));...
+featureMax]
