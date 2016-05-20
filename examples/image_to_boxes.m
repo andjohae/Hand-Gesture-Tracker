@@ -29,8 +29,33 @@ bin_ycc = imopen(bin_ycc, se);
 imshow(bin_ycc);
 title('YCC')
 
-feature_choice = [1, 5, 6, 7];
+feature_choice = [1, 5];
 
+% YCC
+figure(4); hold on
+ycc_regions = regionprops(bin_ycc);
+ycc_large = cat(1,ycc_regions.Area) > 500;
+ycc_bb = cat(1, ycc_regions.BoundingBox);
+ycc_bb = ycc_bb(ycc_large,:);
+
+for i = 1:size(ycc_bb,1)
+  tmp = GetFeatures(imcrop(bin_ycc,ycc_bb(i,:)));
+  if ClassifyWithMinMax(tmp(feature_choice), feature_choice)
+    rectangle('position',ycc_bb(i,:), 'edgecolor','g')
+  else
+    rectangle('position',ycc_bb(i,:), 'edgecolor','r')
+  end
+end
+
+[featureMin;...
+GetFeatures(imcrop(bin_ycc,ycc_bb(1,:)));...
+GetFeatures(imcrop(bin_ycc,ycc_bb(2,:)));...
+GetFeatures(imcrop(bin_ycc,ycc_bb(3,:)));...
+GetFeatures(imcrop(bin_ycc,ycc_bb(4,:)));...
+GetFeatures(imcrop(bin_ycc,ycc_bb(5,:)));...
+featureMax]
+
+%%
 
 % NORMALIZED
 figure(2); hold on
@@ -41,7 +66,7 @@ norm_bb = norm_bb(norm_large,:);
 
 for i = 1:size(norm_bb,1)
   tmp = GetFeatures(imcrop(bin_norm,norm_bb(i,:)));
-  if ClassifyHands(tmp(feature_choice), feature_choice)
+  if ClassifyWithMinMax(tmp(feature_choice), feature_choice)
     rectangle('position',norm_bb(i,:), 'edgecolor','g')
   else
     rectangle('position',norm_bb(i,:), 'edgecolor','r')
@@ -58,33 +83,9 @@ hsv_bb = hsv_bb(hsv_large,:);
 
 for i = 1:size(hsv_bb,1)
   tmp = GetFeatures(imcrop(bin_hsv,hsv_bb(i,:)));
-  if ClassifyHands(tmp(feature_choice), feature_choice)
+  if ClassifyWithMinMax(tmp(feature_choice), feature_choice)
     rectangle('position',hsv_bb(i,:), 'edgecolor','g')
   else
     rectangle('position',hsv_bb(i,:), 'edgecolor','r')
   end
 end
-
-% YCC
-figure(4); hold on
-ycc_regions = regionprops(bin_ycc);
-ycc_large = cat(1,ycc_regions.Area) > 500;
-ycc_bb = cat(1, ycc_regions.BoundingBox);
-ycc_bb = ycc_bb(ycc_large,:);
-
-for i = 1:size(ycc_bb,1)
-  tmp = GetFeatures(imcrop(bin_ycc,ycc_bb(i,:)));
-  if ClassifyHands(tmp(feature_choice), feature_choice)
-    rectangle('position',ycc_bb(i,:), 'edgecolor','g')
-  else
-    rectangle('position',ycc_bb(i,:), 'edgecolor','r')
-  end
-end
-
-[featureMin;...
-GetFeatures(imcrop(bin_ycc,ycc_bb(1,:)));...
-GetFeatures(imcrop(bin_ycc,ycc_bb(2,:)));...
-GetFeatures(imcrop(bin_ycc,ycc_bb(3,:)));...
-GetFeatures(imcrop(bin_ycc,ycc_bb(4,:)));...
-GetFeatures(imcrop(bin_ycc,ycc_bb(5,:)));...
-featureMax]
