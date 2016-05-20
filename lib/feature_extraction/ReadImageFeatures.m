@@ -13,7 +13,7 @@ function [features, key] = ReadImageFeatures(imageDirPath, nFeatures)
   features = zeros(nFiles,nFeatures);
   
   % Loop over all image files in 'imageDirPath'
-  parfor iFile = 1:nFiles
+  for iFile = 1:nFiles
     % Read image from file and convert to logical
     filename = strcat(imageDirPath, files(iFile).name);
     binaryImg = im2bw(imread(filename));
