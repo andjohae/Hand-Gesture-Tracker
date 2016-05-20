@@ -13,21 +13,23 @@ function features = GetFeatures(binaryImg)
 %
 % Note that all features are size invariant.
   
-  % Initialization
+  %%%%% Initialization %%%%%
   structuralElement = strel('square',3);
   
+  %%%% Clean up %%%%%
+  filledImg = imfill(binaryImg, 'holes');
+  img = padarray(filledImg, [1, 1]);
+ 
   %%%%% Extract object properties %%%%%
+  % Object area
+  area = sum(img(:));
   
   % Object perimeter
-  perimeterImg = binaryImg - imerode(binaryImg, structuralElement); 
+  perimeterImg = img - imerode(img, structuralElement); 
   perimeter = sum(perimeterImg(:));
     
-  % Object area
-  filledImg = imfill(perimeterImg);
-  area = sum(filledImg(:));
-    
   % Convex area
-  convexHullImg = bwconvhull( filledImg );
+  convexHullImg = bwconvhull(img);
   convexArea = sum(convexHullImg(:));
   
   % Convex perimeter
@@ -35,7 +37,7 @@ function features = GetFeatures(binaryImg)
   convexPerimeter = sum(convexPerimeterImg(:));
   
   % Thickness
-  tmpImg = binaryImg;
+  tmpImg = img;
   thickness = 0;
   while any(tmpImg(:))
     tmpImg = imerode(tmpImg, structuralElement);
@@ -43,14 +45,15 @@ function features = GetFeatures(binaryImg)
   end
   
   %%%%% Calculate features %%%%%
+  % Shape descriptors
   formFactor = area / (perimeter^2);
   elongatedness = area / (thickness^2);
   convexity = convexPerimeter / perimeter;
   solidity = area / convexArea;
 
-  % Calculate moments
-  areaMoments = GetMoments(binaryImg);
-%   perimeterMoments = GetMoments(perimeterImg); % No significant new info?
+  % Moment invariants
+  areaMoments = GetMoments(img);
+  perimeterMoments = GetMoments(perimeterImg); % No significant new info?
   
   features = [formFactor, elongatedness, convexity, solidity,...
               areaMoments];
