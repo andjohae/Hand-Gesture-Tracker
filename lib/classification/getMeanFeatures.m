@@ -5,13 +5,15 @@
 % Initialization
 clc;
 clear all;
-addpath('../lib/feature_extraction/');
+addpath( genpath('../lib/') );
 
 % Parameters
 IMAGE_DIR_PATH = '../images/feature-eval-images/';
-selectedFeatures = 1:10;
+nTotalFeatures = 10;
 
-knownFeatures = GetKnownHandFeatures(IMAGE_DIR_PATH, selectedFeatures);
+% knownFeatures = GetKnownHandFeatures(IMAGE_DIR_PATH, selectedFeatures);
+[features, key] = ReadImageFeatures(IMAGE_DIR_PATH, nTotalFeatures);
+knownFeatures = features(logical(key),:);
 
 featureMean = mean(knownFeatures);
 featureStd  = std(knownFeatures);
