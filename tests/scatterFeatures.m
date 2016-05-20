@@ -1,16 +1,19 @@
+%% Initialize
 clc;
 clear all;
 
 % Add file paths
-addpath( genpath('../') );
+addpath( genpath('./') );
 
 % Parameters
-imgDirPath = '../images/feature-eval-images/';
+IMAGE_DIR_PATH = './images/feature-eval-images/';
 nTotalFeatures = 10;
 
-% Get features from files
+%% Get features from images
 [features, key] = ReadImageFeatures(imgDirPath, nTotalFeatures);
-key = logical(key);
+
+%% Get features from saved data
+load('./images/feature-eval-images/feature_values.mat');
 
 %% Plot all features
 figure(1);
@@ -27,8 +30,8 @@ FEATURE_NAMES = {'Formfactor','Elongatedness','Convexity','Solidity',...
             'Moment invariant 4','Moment invariant 5','Moment invariant 6'};
 
 groups = cell(length(key),1);
-groups(key) = {'Hands'};
-groups(~key) = {'Non-hands'};
+groups(logical(key)) = {'Hands'};
+groups(~logical(key)) = {'Non-hands'};
 
 h_fig = figure(2);
 clf(h_fig);
