@@ -35,7 +35,10 @@ for iNumFeaturesUsed = nTotalFeatures-1:-1:1
   % Loop over removed features
   for iFeature = 1:nAvailableFeatures
     tmpSelected = [availableFeatures(1:iFeature-1), availableFeatures(iFeature+1:end)];
-    isWrongClass = ClassifyHands(features(:,tmpSelected),tmpSelected) ~= key;
+    
+%     isWrongClass = ClassifyHands(features(:,tmpSelected),tmpSelected) ~= key;
+    isWrongClass = ClassifyWithMinMax(features(:,tmpSelected), tmpSelected) ~= key;
+    
     errorRates(iFeature) = sum(isWrongClass);
   end
   errorRates = errorRates./nCases;

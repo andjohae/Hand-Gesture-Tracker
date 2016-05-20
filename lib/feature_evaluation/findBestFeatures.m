@@ -28,9 +28,10 @@ for iNumUsedFeatures = 1:nTotalFeatures
   errorRates = zeros(nCombinations,1);
   
   for iComb = 1:nCombinations
-    isWrongClass = ClassifyHands(features(:,featureCombinations(iComb)),...
+%     isWrongClass = ClassifyHands(features(:,featureCombinations(iComb)),...
+%       featureCombinations(iComb)) ~= key;
+    isWrongClass = ClassifyWithMinMax(features(:,featureCombinations(iComb)),...
       featureCombinations(iComb)) ~= key;
-    errorRates(iComb) = sum(isWrongClass) / nFiles;
   end
   
   % Find and store best error rate and feature combination
