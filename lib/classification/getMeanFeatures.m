@@ -11,7 +11,6 @@ addpath( genpath('./lib/') );
 IMAGE_DIR_PATH = './images/feature-eval-images/';
 nTotalFeatures = 10;
 
-% knownFeatures = GetKnownHandFeatures(IMAGE_DIR_PATH, selectedFeatures);
 [features, key] = ReadImageFeatures(IMAGE_DIR_PATH, nTotalFeatures);
 knownFeatures = features(logical(key),:);
 
