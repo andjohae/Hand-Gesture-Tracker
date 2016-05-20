@@ -28,6 +28,7 @@ ycc_bb = ycc_bb(ycc_large,:);
 for i = 1:size(ycc_bb,1)
   tmp = GetFeatures(imcrop(bin_ycc,ycc_bb(i,:)));
   if ClassifyWithMinMax(tmp(feature_choice), feature_choice)
+%   if NeuralNetwork(tmp')
     rectangle('position',ycc_bb(i,:), 'edgecolor','g')
   else
     rectangle('position',ycc_bb(i,:), 'edgecolor','r')
