@@ -5,7 +5,7 @@
 % Initialization
 clc;
 clear all;
-addpath('../lib/feature_extraction');
+addpath(genpath('./lib/'));
 
 IMAGE_DIR_PATH = '../images/feature-eval-images/';
 FEATURE_NAMES = {'Formfactor','Elongatedness','Convexity','Solidity',...
@@ -15,8 +15,11 @@ nTotalFeatures = length(FEATURE_NAMES);
 minErrorRates = zeros(nTotalFeatures,1);
 bestFeatures = cell(nTotalFeatures,1);          
 
-% Read features and key table from images
-[features, key] = ReadImageFeatures(IMAGE_DIR_PATH, nTotalFeatures);
+% % Read features and key table from images
+% [features, key] = ReadImageFeatures(IMAGE_DIR_PATH, nTotalFeatures);
+
+% Load existing feature data: [features, key]
+load('./images/feature-eval-images/feature_values.mat');
 
 % Loop over feature combinations
 for iNumUsedFeatures = 1:nTotalFeatures

@@ -1,7 +1,7 @@
 %% Backward selection
 clc;
 clear all;
-addpath('../lib/feature_extraction/');
+addpath(genpath('./lib/'));
 
 % Parameters
 IMAGE_DIR_PATH = '../images/feature-eval-images/';
@@ -15,8 +15,12 @@ bestErrorRates = zeros(nTotalFeatures,1);
 selectedFeatures = zeros(nTotalFeatures,1);
 availableFeatures = 1:nTotalFeatures;
 
-% Read features and key table from images
-[features, key] = ReadImageFeatures(IMAGE_DIR_PATH, nTotalFeatures);
+% % Read features and key table from images
+% [features, key] = ReadImageFeatures(IMAGE_DIR_PATH, nTotalFeatures);
+
+% Load existing feature data: [features, key]
+load('./images/feature-eval-images/feature_values.mat');
+
 nCases = size(features,1);
 
 % Calculate error rate for all features used
