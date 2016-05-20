@@ -41,13 +41,16 @@ for iNumUsedFeatures = 1:nTotalFeatures
 end
  
 %% Print results
-[minErrorRate, iBest] = min(errorRates);
+clc;
 
-fprintf('Best classification rate: %.3f\n', 1-minErrorRate);
+[bestErrorRate, iBest] = min(minErrorRates);
+
+fprintf('Best classification rate: %.3f\n', 1-bestErrorRate);
 fprintf('obtained for feature vector:\n');
 fprintf('%s\n', FEATURE_NAMES{bestFeatures{iBest}})
 
 for i = 1:length(FEATURE_NAMES)
 fprintf('\nNumber of features: %d\n',i);
+fprintf('Classification rate: %.3f\n', 1-minErrorRates(i));
 fprintf('%s\n', FEATURE_NAMES{bestFeatures{i}});
 end

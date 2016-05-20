@@ -63,7 +63,7 @@ hold on
 hold off
 
 set(gca,'XTick',1:nTotalFeatures);
-axis([0.5 10.5 0.75 1.1]);
+axis([0.5 10.5 0.5 1.1]);
 box on;
 grid on;
 
