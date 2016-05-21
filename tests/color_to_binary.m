@@ -1,9 +1,10 @@
-%set(0,'DefaultFigureWindowStyle','docked')
+set(0,'DefaultFigureWindowStyle','docked')
 addpath(genpath('./lib/'))
+addpath(genpath('./images/'))
 
-I = imread('images/handAndFaceImages/handAndFace3.jpg');
+%I = imread('images/handAndFaceImages/handAndFace3.jpg');
 %I = imread('images/images-04-26/shirt2.jpg');
-%I = imread('images/image3.jpg');
+I = imread('images/image2.jpg');
 
 fig1 = figure(1); clf
 imshow(I)
