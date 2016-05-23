@@ -20,6 +20,7 @@ function [features, key] = ReadImageFeatures(imageDirPath, nFeatures)
     
     % Get object features from image
     features(iFile,:) = GetFeatures(binaryImg);
+    display(strcat('Progress: ',num2str(iFile/nFiles*100),'%'));
   end
 
 end
