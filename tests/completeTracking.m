@@ -7,7 +7,7 @@ addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-movie = 'testMov1.mov';
+movie = 'zVid_2.mov';
 vidObj = VideoReader(movie);
 
 % Obtaining the first frame of the movie 
@@ -46,8 +46,8 @@ for i = 1:length(areas)
 end
 
 % Temporarily choosing the largest region.
-handRegion = bBox(sortedIdxs(1),:);
-handCenter = centroids(sortedIdxs(1),:);
+handRegion = bBox(sortedIdxs(2),:);
+handCenter = centroids(sortedIdxs(2),:);
 
 
 % Chosing an appropriate cropping box for efficient tracking.
@@ -64,37 +64,32 @@ state = [handCenter(1); handCenter(2);0;0];
 estimate = state;
 P = zeros(4);
 
-%%
-movieCell = {}; iter = 1;
 while hasFrame(vidObj)  
-  movieCell{iter} = readFrame(vidObj);
-  iter = iter + 1
-end
-%%
-
-for i = 1:iter
-%while hasFrame(vidObj)  
   
   tic;
   xPrevCenter = handRegion(1) + handRegion(3)/2;
   yPrevCenter = handRegion(2) + handRegion(4)/2;
-  %currentImage = readFrame(vidObj);
-  currentImage = movieCell{i};
+  currentImage = readFrame(vidObj);
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
   
   center = ComputeCenterOfMass(binaryImage);
   xNewCenter = handRegion(1) + center(1);
   yNewCenter = handRegion(2) + center(2);
-  handRegion(1) = handRegion(1) + xNewCenter - xPrevCenter;
-  handRegion(2) = handRegion(2) + yNewCenter - yPrevCenter;
   
   state = [xNewCenter; yNewCenter; ...
            xNewCenter - xPrevCenter;yNewCenter - yPrevCenter];
   
-  
   [~, estimate, P] = PredictState(state, estimate, P);
   trajectory = [trajectory; xNewCenter,yNewCenter];
   kalmanTrajectory = [kalmanTrajectory; estimate(1),estimate(2)];
+  
+  %handRegion(1) = handRegion(1) + xNewCenter - xPrevCenter;
+  %handRegion(2) = handRegion(2) + yNewCenter - yPrevCenter;
+  
+  handRegion(1) = estimate(1) - handRegion(3)/2;
+  handRegion(2) = estimate(2) - handRegion(4)/2;
+  
+
   
   image(currentImage);
   hold on;
