@@ -2,15 +2,15 @@ addpath(genpath('./lib/'))
 addpath(genpath('./images/'))
 
 %I = imread('images/image3.jpg');
-I = imread('images/sequenceImages-05-02/im3.jpg');
-%I = imread('images/handAndFaceImages/handAndFace3.jpg');
+%I = imread('images/sequenceImages-05-02/im3.jpg');
+I = imread('images/handAndFaceImages/handAndFace3.jpg');
 
 figure(1); clf
 imshow(I)
 
 se = strel('disk',4);
 
-figure(4); clf
+fig4 = figure(4); clf
 bin_ycc = Ycc2Binary(I);
 bin_ycc = imopen(bin_ycc, se);
 imshow(bin_ycc);
@@ -39,6 +39,8 @@ end
 %GetFeatures(imcrop(bin_ycc,ycc_bb(1,:)));...
 %featureMax]
 
+%%
+print(fig4,'-depsc','~/tmp/figures/boxes_colored')
 %%
 
 figure(2); clf
