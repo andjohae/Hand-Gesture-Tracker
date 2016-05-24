@@ -8,10 +8,10 @@ addpath(genpath('./images'))
 load('./images/feature-eval-images/feature_values.mat')
 idxs = crossvalind('Kfold',size(features,1),5);
 cp = classperf(key);
-for i = 1:10
+for i = 1:5
     test = (idxs == i); train = ~test;
     model = fitcsvm(features(train,:),key(train,:));
     class = predict(model,features(test,:));
-    classperf(cp,class,test)
+    classperf(cp,class,test);
 end
-cp.ErrorRate
+cp.DiagnosticTable
