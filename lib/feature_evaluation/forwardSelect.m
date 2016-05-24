@@ -63,17 +63,17 @@ hold on
 hold off
 
 set(gca,'XTick',1:nTotalFeatures);
-axis([0.5 10.5 0.5 1.1]);
+axis([0.5 10.5 0.7 1.0]);
 box on;
 grid on;
 
-title('Classification rates from forward selection',...
-    'Interpreter','Latex','FontSize',16);
+% title('Classification rates from forward selection',...
+%     'Interpreter','Latex','FontSize',16);
 ylabel('Classification rate','Interpreter','Latex','FontSize',14);
 xlabel('Number of features used','Interpreter','Latex','FontSize',14);
 
 % Add list of features in order of addition
-annotationPosition = [0.17 0.15 0.27 0.47];
+annotationPosition = [0.2 0.18 0.27 0.47];
 annotationStringForward = cell(nTotalFeatures,1);
 for i = 1:nTotalFeatures
   annotationStringForward(i) = strcat(sprintf('(%d) ',i),FEATURE_NAMES(selectedFeatures(i)));
