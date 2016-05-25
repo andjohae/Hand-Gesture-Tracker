@@ -20,6 +20,7 @@ function features = GetFeatures(binaryImg)
   if ~islogical(binaryImg)
     disp('Converting image to binary format for feature extraction\n');
     binaryImg = im2bw(binaryImg);
+    %binaryImg = centerobject(binaryImg);
   end
   
   %%%% Clean up %%%%%

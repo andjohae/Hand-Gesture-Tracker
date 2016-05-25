@@ -7,7 +7,7 @@ addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-movie = 'zVid_2.mov';
+movie = 'openAndCloseVid2.mov';
 vidObj = VideoReader(movie);
 
 % Obtaining the first frame of the movie 
@@ -15,6 +15,7 @@ vidObj = VideoReader(movie);
 
 currentImage = readFrame(vidObj);
 currentBinaryImage = Ycc2Binary(currentImage);% & Ycc2Binary(currentImage);
+currentBinaryImage = imopen(currentBinaryImage, strel('disk',5));
 videoDims = size(currentBinaryImage);
 
 % Extracting regions.
@@ -31,27 +32,43 @@ toc
 % CURRENTLY NOT CLASSIFYING ANY HAND!
 handCenter = [0, 0];
 handRegion = [0, 0, 0, 0];
+% for i = 1:length(areas)
+%   if(areas(i) >= 500)
+%     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
+%     selectedFeatures = [1 2 3 6 7]; % Example
+%     features = GetFeatures(binaryImage);
+%     class = ClassifyHands(features(selectedFeatures),selectedFeatures)
+%     if(class == 1) % If hand is found - save location and break.
+%       handRegion = bBox(i,:);
+%       handCenter = centroids(i,:);
+%       break;
+%     end
+%   end
+% end
+
+load('./images/feature-eval-images/feature_values.mat');
+model = fitcsvm(features,key);
+
 for i = 1:length(areas)
   if(areas(i) >= 500)
     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
-    selectedFeatures = [1 2 3 6 7]; % Example
     features = GetFeatures(binaryImage);
-    class = ClassifyHands(features(selectedFeatures),selectedFeatures)
+    class = predict(model,features)
     if(class == 1) % If hand is found - save location and break.
       handRegion = bBox(i,:);
-      handCenter = centroids(i,:);
+      handCenter = centroids(i,:)
       break;
     end
   end
 end
 
 % Temporarily choosing the largest region.
-handRegion = bBox(sortedIdxs(2),:);
-handCenter = centroids(sortedIdxs(2),:);
+%handRegion = bBox(sortedIdxs(1),:);
+%handCenter = centroids(sortedIdxs(1),:);
 
 
 % Chosing an appropriate cropping box for efficient tracking.
-side = min(handRegion(3),handRegion(4));
+side = max(handRegion(3),handRegion(4));
 handRegion(3) = side; handRegion(4) = side;
 %binaryImage = imcrop(currentBinaryImage, handRegion);
 
@@ -63,7 +80,10 @@ kalmanTrajectory = [NaN, NaN; handCenter(1), handCenter(2)];
 state = [handCenter(1); handCenter(2);0;0];
 estimate = state;
 P = zeros(4);
+%imshow(currentBinaryImage); 
+%rectangle('position',handRegion,'edgecolor','r');shg
 
+iter = 0;
 while hasFrame(vidObj)  
   
   tic;
@@ -71,6 +91,9 @@ while hasFrame(vidObj)
   yPrevCenter = handRegion(2) + handRegion(4)/2;
   currentImage = readFrame(vidObj);
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
+  binaryImage = imopen(binaryImage, strel('disk',5));
+  %imwrite(binaryImage,strcat(num2str(iter),'videoIm_2.jpg'));
+  %iter = iter+1;
   
   center = ComputeCenterOfMass(binaryImage);
   xNewCenter = handRegion(1) + center(1);
@@ -95,7 +118,15 @@ while hasFrame(vidObj)
   hold on;
   plot(xNewCenter,yNewCenter,'r*')
   plot(estimate(1),estimate(2),'go')
-  rectangle('position', handRegion);
+  
+  regionFeatures = GetFeatures(binaryImage);
+  class = predict(model,regionFeatures);
+  myColor = 'r';
+  if(class == 1)
+    myColor = 'g';
+  end
+  
+  rectangle('position', handRegion,'edgecolor',myColor);
   legend('Normal','Adaptive Kalman');
   t = toc;
   currAxes.Visible = 'off';

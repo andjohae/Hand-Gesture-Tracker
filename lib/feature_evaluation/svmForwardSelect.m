@@ -8,7 +8,7 @@ IMAGE_DIR_PATH = '../images/feature-eval-images/';
 FEATURE_NAMES = {'Formfactor','Elongatedness','Convexity','Solidity',...
             'Area moment 1','Area moment 2','Area moment 3',...
             'Area moment 4','Area moment 5','Area moment 6'};
-
+          
 % Initialization
 nTotalFeatures = size(FEATURE_NAMES,2);
 bestErrorRates = zeros(nTotalFeatures,1);
@@ -20,6 +20,7 @@ availableFeatures = 1:nTotalFeatures;
 
 % Load existing feature data: [features, key]
 load('./images/feature-eval-images/feature_values.mat');
+features = [features(:,1:4),normc(features(:,5:end))];
 
 nCases = size(features,1);
 
@@ -42,10 +43,9 @@ for iNumFeaturesUsed = 1:nTotalFeatures
         classperf(cp,class,test);
         tmpError = tmpError + cp.ErrorRate;
     end
-    
     errorRates(iFeature) = tmpError/nFold;
   end
-  
+  display(strcat(num2str(iFeature),' features processed.'));
   % Store best additional feature
   [tmpErrorRate, iBestFeature] =  min(errorRates);
   selectedFeatures = [selectedFeatures, availableFeatures(iBestFeature)];
