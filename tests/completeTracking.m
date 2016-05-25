@@ -50,7 +50,7 @@ load('./images/feature-eval-images/feature_values.mat');
 model = fitcsvm(features,key);
 
 for i = 1:length(areas)
-  if(areas(i) >= 1000)
+  if(areas(i) >= 500)
     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
     features = GetFeatures(binaryImage);
     class = predict(model,features)
@@ -92,7 +92,7 @@ while hasFrame(vidObj)
   currentImage = readFrame(vidObj);
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
   binaryImage = imopen(binaryImage, strel('disk',5));
-  %imwrite(binaryImage,strcat(num2str(iter),'videoIm.jpg'));
+  %imwrite(binaryImage,strcat(num2str(iter),'videoIm_2.jpg'));
   %iter = iter+1;
   
   center = ComputeCenterOfMass(binaryImage);
