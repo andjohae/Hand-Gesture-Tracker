@@ -14,17 +14,6 @@ targets = zeros(2,length(key));
 targets(1,logical(key)) = 1;
 targets(2,~logical(key)) = 1;
 
->> help genFunction
-genFunction - Generate MATLAB function for simulating neural network
-
-    This MATLAB function generates a complete stand-alone MATLAB function for
-    simulating a neural network including all settings, weight and bias values,
-    module functions, and calculations in one file.
-
-    genFunction(net,pathname)
-    genFunction(___,'MatrixOnly','yes')
-    genFunction(___,'ShowLinks','no')
-
 % Create pattern recognition network with Scaled Conjugate Gradient method
 net = patternnet(hiddenLayerSize,'trainscg');
 
