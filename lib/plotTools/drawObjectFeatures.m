@@ -2,9 +2,9 @@
 clc;
 clear all;
 
-addpath( genpath('../') );
+addpath( genpath('./lib') );
 
-imgPath = '../images/demo.jpg';
+imgPath = './images/demo_small.jpg';
 bwImg = im2bw(imread(imgPath));
 imshow(bwImg);
 
@@ -15,7 +15,7 @@ structuralElement = strel('square',3);
 perimeterImg = bwImg - imerode(bwImg, structuralElement); 
 
 % Object area
-filledImg = imfill(perimeterImg);
+filledImg = imfill(perimeterImg, 'holes');
 
 % Convex area
 convexHullImg = bwconvhull( filledImg );
@@ -24,15 +24,20 @@ convexHullImg = bwconvhull( filledImg );
 convexPerimeterImg = convexHullImg - imerode(convexHullImg,structuralElement);
 
 %% Draw images
+
+% Perimeter
 h_fig1 = figure(1);
 clf(h_fig1);
 imshow(perimeterImg);
 
-%%
-h_fig2 = figure(2);
+% Hand and convex hull perimeter
+h_fig2 = figure(2); 
 clf(h_fig2);
-% imshow(bwImg);
-[row, col] = ind2sub(size(bwImg),find(convexPerimeterImg));
-hold on
-  h_convPerim = plot(row,col,'r');
-hold off
+imshow(bwImg);
+plot(X,Y,'r')
+
+%% 
+compositeImg = imfuse(bwImg, convexPerimeterImg);
+compositeImg = im2bw(sum(compositeImg,3));
+
+imshow(compositeImg)

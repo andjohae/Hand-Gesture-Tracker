@@ -10,7 +10,7 @@ IMAGE_DIR_PATH = './images/feature-eval-images/';
 nTotalFeatures = 10;
 
 %% Get features from images
-[features, key] = ReadImageFeatures(imgDirPath, nTotalFeatures);
+% [features, key] = ReadImageFeatures(imgDirPath, nTotalFeatures);
 
 %% Get features from saved data
 load('./images/feature-eval-images/feature_values.mat');
@@ -23,7 +23,7 @@ h_gplot = gplotmatrix(features(:,1:end), features(:,1:end), key);
 
 % Choose features to plot
 f1 = 3;
-f2 = 5;
+f2 = 4;
 
 FEATURE_NAMES = {'Formfactor','Elongatedness','Convexity','Solidity',...
             'Moment invariant 1','Moment invariant 2','Moment invariant 3',...
