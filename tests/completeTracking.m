@@ -1,41 +1,47 @@
-% This file is intended to crop the image in each localization of the hand
-% region and use the ComputeCenterOfMass-function to efficiently locate
-% the region of interest. 
+% Complete tracking program for tracking hand motions. The program 
+% finds a hand in a video specified by the user by the movie-variable.
+% When the hand region is found (or set to the largest region if no
+% hand is found) the tracking begins. For each frame of the video a 
+% classification also occurs and a rectangle specifying the hand region 
+% is superimposed in the image indicating wheter the region contains a hand
+% (green) or not (red).
+%
+% There are three different classification methods currently specified in
+% the code. Depending on which of them to use the user may comment and
+% uncomment sections of the code (see comments in the code).
 
 clf; clear all;
 addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-movie = 'nineVid_2.mov';
+movie = 'whiteBackVid_3.mov';
 vidObj = VideoReader(movie);
 
-% Obtaining the first frame of the movie 
-% and detects the most likely region to contain a hand.
-
+% Reads first frame of the video object and processes the image 
+% to make skin regions white and all other regions black (optimally)
 currentImage = readFrame(vidObj);
-currentBinaryImage = Ycc2Binary(currentImage);% & Ycc2Binary(currentImage);
+currentBinaryImage = Ycc2Binary(currentImage);
 currentBinaryImage = imopen(currentBinaryImage, strel('disk',5));
 videoDims = size(currentBinaryImage);
 
-% Extracting regions.
-
-tic
+% Extracting white regions.
 regions = regionprops(currentBinaryImage);
 [~, sortedIdxs] = sort(-[regions.Area]);
 centroids = cat(1,regions.Centroid);
 bBox = cat(1,regions.BoundingBox);
 areas = cat(1,regions.Area);
-toc
 
-% Finding hand region. (Do not consider small regions Area < 500)
-% CURRENTLY NOT CLASSIFYING ANY HAND!
+
+load('./images/feature-eval-images/feature_values.mat');
 handCenter = [0, 0];
 handRegion = [0, 0, 0, 0];
+
+%############ "REGUALR" CLASSIFICATION #############
+% selectedFeatures = [1 2 3 4 5 6 7 8 9 10]; % Example
 % for i = 1:length(areas)
 %   if(areas(i) >= 500)
 %     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
-%     selectedFeatures = [1 2 3 6 7]; % Example
 %     features = GetFeatures(binaryImage);
 %     class = ClassifyHands(features(selectedFeatures),selectedFeatures)
 %     if(class == 1) % If hand is found - save location and break.
@@ -45,11 +51,28 @@ handRegion = [0, 0, 0, 0];
 %     end
 %   end
 % end
+%##################################################
 
-load('./images/feature-eval-images/feature_values.mat');
-model = fitcsvm(features,key);
 
-% % SVM classification
+%############ MIN_MAX CLASSIFICATION ##############
+% selectedFeatures = [1 2 3 4 5 6 7 8 9 10]; % Example
+% for i = 1:length(areas)
+%   if(areas(i) >= 500)
+%     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
+%     features = GetFeatures(binaryImage);
+%     class = ClassifyWithMinMax(features(selectedFeatures),selectedFeatures)
+%     if(class == 1) % If hand is found - save location and break.
+%       handRegion = bBox(i,:);
+%       handCenter = centroids(i,:);
+%       break;
+%     end
+%   end
+% end
+%##################################################
+
+
+%################## SVM classification ##################
+% model = fitcsvm(features,key);
 % for i = 1:length(areas)
 %   if(areas(i) >= 500)
 %     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
@@ -62,8 +85,10 @@ model = fitcsvm(features,key);
 %     end
 %   end
 % end
+%########################################################
 
-% NN classification
+
+%################ NN classification ###############
 class = [0;0;0];
 for i = 1:length(areas)
   if(areas(i) >= 500)
@@ -72,54 +97,45 @@ for i = 1:length(areas)
     class = [class,[NeuralNetwork(features');i]];
   end
 end
-
 [~,tmpIndex] = max(class(1,:));
 if(tmpIndex ~= 1)
   handRegion = bBox(class(3,tmpIndex),:);
   handCenter = centroids(class(3,tmpIndex),:);
 end
+%##################################################
 
 
-% Temporarily choosing the largest region.
+% If the classification didn't manage to find a hand we choose
+% the largest blob as the hand region.
 if(handCenter(1) == 0 && handCenter(2) == 0)
-  handRegion = bBox(sortedIdxs(2),:);
-  handCenter = centroids(sortedIdxs(2),:);
+  handRegion = bBox(sortedIdxs(1),:);
+  handCenter = centroids(sortedIdxs(1),:);
 end
 
-
-
-% Chosing an appropriate cropping box for efficient tracking.
+% The hand region size is set to be the square with side equal to the
+% largest side of the regionprops-rectangle covering the hand.
 side = max(handRegion(3),handRegion(4));
 handRegion(3) = side; handRegion(4) = side;
-%binaryImage = imcrop(currentBinaryImage, handRegion);
 
-% Initializing the trajectory tracking.
+% Initializing the trajectory to start and the hand center and 
+% defining the matrix P for the Kalman filter.
 trajectory = [NaN, NaN; handCenter(1), handCenter(2)];
 kalmanTrajectory = [NaN, NaN; handCenter(1), handCenter(2)];
-
-% Assuming that there is no initial motion.
 state = [handCenter(1); handCenter(2);0;0];
 estimate = state;
 P = zeros(4);
-%imshow(currentBinaryImage); 
-%rectangle('position',handRegion,'edgecolor','r');shg
 
-iter = 0;
 while hasFrame(vidObj)  
-  
-  tic;
+
   xPrevCenter = handRegion(1) + handRegion(3)/2;
   yPrevCenter = handRegion(2) + handRegion(4)/2;
   currentImage = readFrame(vidObj);
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
   binaryImage = imopen(binaryImage, strel('disk',5));
-  %imwrite(binaryImage,strcat(num2str(iter),'videoIm_4.jpg'));
-  %iter = iter+1;
   
   center = ComputeCenterOfMass(binaryImage);
   xNewCenter = handRegion(1) + center(1);
   yNewCenter = handRegion(2) + center(2);
-  
   state = [xNewCenter; yNewCenter; ...
            xNewCenter - xPrevCenter;yNewCenter - yPrevCenter];
   
@@ -127,38 +143,40 @@ while hasFrame(vidObj)
   trajectory = [trajectory; xNewCenter,yNewCenter];
   kalmanTrajectory = [kalmanTrajectory; estimate(1),estimate(2)];
   
-  %handRegion(1) = handRegion(1) + xNewCenter - xPrevCenter;
-  %handRegion(2) = handRegion(2) + yNewCenter - yPrevCenter;
-  
   handRegion(1) = estimate(1) - handRegion(3)/2;
   handRegion(2) = estimate(2) - handRegion(4)/2;
   
+  %############### CHOOSE CLASSIFICATION METHOD ##############
+  % Extracing features and classifying image
+  regionFeatures = GetFeatures(binaryImage); 
+  % class = predict(model,regionFeatures); % SVM-classification
+  % MIN-MAX classification (below)..
+  %class = ClassifyWithMinMax(regionFeatures(selectedFeatures),selectedFeatures);
+  % Regular classification below..
+  %class = ClassifyHands(regionFeatures(selectedFeatures),selectedFeatures);
+  [~,class] = max(NeuralNetwork(regionFeatures')); % NN-classification
+  %############################################################
 
   
-  image(currentImage);
-  hold on;
-  plot(xNewCenter,yNewCenter,'r*')
-  plot(estimate(1),estimate(2),'go')
-  
-  regionFeatures = GetFeatures(binaryImage);
-  %class = predict(model,regionFeatures);
-  [~,class] = max(NeuralNetwork(regionFeatures'));
+  % Plotting the image together with hand region colored according to 
+  % classification results.
   myColor = 'r';
   if(class == 1)
     myColor = 'g';
   end
-  
+  image(currentImage);
+  hold on;
+  plot(xNewCenter,yNewCenter,'r*')
+  plot(estimate(1),estimate(2),'go')
   rectangle('position', handRegion,'edgecolor',myColor);
   legend('Normal','Adaptive Kalman');
-  t = toc;
   currAxes.Visible = 'off';
-  pause(max(1/vidObj.FrameRate-t,0));
   drawnow
   shg
   
 end
 
-%%
+%% Plotting the trajectories of the movements saved by previous script.
 
 clf;
 vidObj = VideoReader(movie);
@@ -167,8 +185,6 @@ imshow(currentImage);
 hold on 
 plot(trajectory(:,1),trajectory(:,2),'r')
 plot(kalmanTrajectory(:,1),kalmanTrajectory(:,2),'g')
-leg = legend('Measured trajectory','Kalman trajectory')
+leg = legend('Measured trajectory','Kalman trajectory');
 set(leg,'interpreter', 'latex')
 shg
-
-%%
