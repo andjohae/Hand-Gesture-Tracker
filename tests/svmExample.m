@@ -6,6 +6,7 @@ addpath(genpath('./images'))
 
 
 load('./images/feature-eval-images/feature_values.mat')
+%features = normc(features)
 idxs = crossvalind('Kfold',size(features,1),5);
 cp = classperf(key);
 for i = 1:5

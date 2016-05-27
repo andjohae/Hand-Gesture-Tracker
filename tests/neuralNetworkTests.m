@@ -40,6 +40,7 @@ plotconfusion(targets, outputs);
 %figure, ploterrhist(error)
 %figure, plotregression(t,y)
 %figure, plotfit(net,x,t)
+shg
 
 %% Save network
 networkPath = './lib/classification/NeuralNetwork.m';

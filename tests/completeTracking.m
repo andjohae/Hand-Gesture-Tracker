@@ -2,12 +2,12 @@
 % region and use the ComputeCenterOfMass-function to efficiently locate
 % the region of interest. 
 
-clf;
+clf; clear all;
 addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-movie = 'openAndCloseVid2.mov';
+movie = 'openAndCloseVid1.mov';
 vidObj = VideoReader(movie);
 
 % Obtaining the first frame of the movie 
@@ -49,22 +49,43 @@ handRegion = [0, 0, 0, 0];
 load('./images/feature-eval-images/feature_values.mat');
 model = fitcsvm(features,key);
 
+% % SVM classification
+% for i = 1:length(areas)
+%   if(areas(i) >= 500)
+%     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
+%     features = GetFeatures(binaryImage);
+%     class = predict(model,features);
+%     if(class == 1) % If hand is found - save location and break.
+%       handRegion = bBox(i,:);
+%       handCenter = centroids(i,:)
+%       break;
+%     end
+%   end
+% end
+
+% NN classification
+class = [0;0;0];
 for i = 1:length(areas)
   if(areas(i) >= 500)
     binaryImage = imcrop(currentBinaryImage, bBox(i,:));
     features = GetFeatures(binaryImage);
-    class = predict(model,features)
-    if(class == 1) % If hand is found - save location and break.
-      handRegion = bBox(i,:);
-      handCenter = centroids(i,:)
-      break;
-    end
+    class = [class,[NeuralNetwork(features');i]];
   end
 end
 
+[~,tmpIndex] = max(class(1,:));
+if(tmpIndex ~= 1)
+  handRegion = bBox(class(3,tmpIndex),:);
+  handCenter = centroids(class(3,tmpIndex),:);
+end
+
+
 % Temporarily choosing the largest region.
-%handRegion = bBox(sortedIdxs(1),:);
-%handCenter = centroids(sortedIdxs(1),:);
+if(handCenter(1) == 0 && handCenter(2) == 0)
+  handRegion = bBox(sortedIdxs(2),:);
+  handCenter = centroids(sortedIdxs(2),:);
+end
+
 
 
 % Chosing an appropriate cropping box for efficient tracking.
@@ -92,8 +113,8 @@ while hasFrame(vidObj)
   currentImage = readFrame(vidObj);
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
   binaryImage = imopen(binaryImage, strel('disk',5));
-  %imwrite(binaryImage,strcat(num2str(iter),'videoIm_2.jpg'));
-  %iter = iter+1;
+  imwrite(binaryImage,strcat(num2str(iter),'videoIm_4.jpg'));
+  iter = iter+1;
   
   center = ComputeCenterOfMass(binaryImage);
   xNewCenter = handRegion(1) + center(1);
@@ -120,7 +141,8 @@ while hasFrame(vidObj)
   plot(estimate(1),estimate(2),'go')
   
   regionFeatures = GetFeatures(binaryImage);
-  class = predict(model,regionFeatures);
+  %class = predict(model,regionFeatures);
+  [~,class] = max(NeuralNetwork(regionFeatures'));
   myColor = 'r';
   if(class == 1)
     myColor = 'g';
