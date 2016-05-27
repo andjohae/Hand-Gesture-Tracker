@@ -7,7 +7,7 @@ addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-movie = 'openAndCloseVid1.mov';
+movie = 'nineVid_2.mov';
 vidObj = VideoReader(movie);
 
 % Obtaining the first frame of the movie 
@@ -113,8 +113,8 @@ while hasFrame(vidObj)
   currentImage = readFrame(vidObj);
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
   binaryImage = imopen(binaryImage, strel('disk',5));
-  imwrite(binaryImage,strcat(num2str(iter),'videoIm_4.jpg'));
-  iter = iter+1;
+  %imwrite(binaryImage,strcat(num2str(iter),'videoIm_4.jpg'));
+  %iter = iter+1;
   
   center = ComputeCenterOfMass(binaryImage);
   xNewCenter = handRegion(1) + center(1);
