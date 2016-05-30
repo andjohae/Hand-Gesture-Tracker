@@ -1,14 +1,9 @@
-% Computing center of mass of binaryImage. Code borrowed from
-% http://se.mathworks.com/matlabcentral/answers/155558-center-of-mass-of-binary-image
-% date: 2016-05-16
-function center = ComputeCenterOfMass(binaryImage)
+% Computing center of mass of binary image I.
+function center = ComputeCenterOfMass(I)
 
-  img = binaryImage;
-  [x, y] = meshgrid(1:size(img, 2), 1:size(img, 1));
-  weightedx = x .* img;
-  weightedy = y .* img;
-  xcenter = sum(weightedx(:)) / sum(img(:));
-  ycenter = sum(weightedy(:)) / sum(img(:));
-  center = [xcenter, ycenter];
+  na = sum(sum(I));
+  x = sum(sum(I.*repmat([1:size(I,2)],size(I,1),1)))/na;
+  y = sum(sum(I.*repmat([1:size(I,1)]',1,size(I,2))))/na;
+  center = [x,y];
   
 end

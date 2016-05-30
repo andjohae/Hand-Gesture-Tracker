@@ -15,7 +15,7 @@ addpath(genpath('./lib/'));
 addpath(genpath('./images/'));
 addpath('./tests/');
 currAxes = axes;
-movie = 'whiteBackVid_3.mov';
+movie = 'whiteBackVid_1.mov';
 vidObj = VideoReader(movie);
 
 % Reads first frame of the video object and processes the image 
@@ -125,14 +125,31 @@ state = [handCenter(1); handCenter(2);0;0];
 estimate = state;
 P = zeros(4);
 
-while hasFrame(vidObj)  
+%% Optional pre-read
+images = {};
+newObj = vidObj;
+iter = 1;
+while(hasFrame(newObj))
+  images{iter} = readFrame(newObj);
+  iter = iter+1
+end
 
+%%
+clf
+iter = 1;
+for i = 1:length(images)
+%while hasFrame(vidObj)  
+
+  tic
   xPrevCenter = handRegion(1) + handRegion(3)/2;
   yPrevCenter = handRegion(2) + handRegion(4)/2;
-  currentImage = readFrame(vidObj);
+  %currentImage = readFrame(vidObj);
+  currentImage = images{iter};
+  iter = iter+1;
+  
+  
   binaryImage = Ycc2Binary(imcrop(currentImage,handRegion));
   binaryImage = imopen(binaryImage, strel('disk',5));
-  
   center = ComputeCenterOfMass(binaryImage);
   xNewCenter = handRegion(1) + center(1);
   yNewCenter = handRegion(2) + center(2);
@@ -146,6 +163,7 @@ while hasFrame(vidObj)
   handRegion(1) = estimate(1) - handRegion(3)/2;
   handRegion(2) = estimate(2) - handRegion(4)/2;
   
+  
   %############### CHOOSE CLASSIFICATION METHOD ##############
   % Extracing features and classifying image
   regionFeatures = GetFeatures(binaryImage); 
@@ -156,21 +174,24 @@ while hasFrame(vidObj)
   %class = ClassifyHands(regionFeatures(selectedFeatures),selectedFeatures);
   [~,class] = max(NeuralNetwork(regionFeatures')); % NN-classification
   %############################################################
-
-  
+  toc
   % Plotting the image together with hand region colored according to 
   % classification results.
   myColor = 'r';
   if(class == 1)
     myColor = 'g';
   end
+  
   image(currentImage);
+  
   hold on;
   plot(xNewCenter,yNewCenter,'r*')
   plot(estimate(1),estimate(2),'go')
   rectangle('position', handRegion,'edgecolor',myColor);
   legend('Normal','Adaptive Kalman');
-  currAxes.Visible = 'off';
+  
+  %currAxes.Visible = 'off';
+  %display('1')
   drawnow
   shg
   
