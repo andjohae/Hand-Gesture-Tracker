@@ -1,7 +1,7 @@
 function class = ClassifyWithMinMax(features, selectedFeatures)
   % Parameters
   
-  NICE = 0.1;
+  NICE = 0;
   
   minFeatures = [0.0067,...
                  2.1858,...
