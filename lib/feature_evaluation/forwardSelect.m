@@ -31,9 +31,18 @@ for iNumFeaturesUsed = 1:nTotalFeatures
   for iFeature = 1:nAvailableFeatures
     tmpSelected = [selectedFeatures, availableFeatures(iFeature)];
     
+    % Old classification methods
 %     isWrongClass = ClassifyHands(features(:,tmpSelected),tmpSelected) ~= key;
-    isWrongClass = ClassifyWithMinMax(features(:,tmpSelected), tmpSelected) ~= key;
+%     isWrongClass = ClassifyWithMinMax(features(:,tmpSelected), tmpSelected) ~= key;
     
+    % Example of new min/max classification
+    tmpFeatures = features(:,tmpSelected); % Should extrakt selected features for training set
+    minFeatures = min(tmpFeatures); % Should be calculated on training set
+    maxFeatures = max(tmpFeatures); % Should be calculated on training set
+    
+    % Change tmpFeatures and key to correspond to validation set 
+    isWrongClass = ClassifyMinMax(tmpFeatures, minFeatures, maxFeatures) ~= key;
+
     errorRates(iFeature) = sum(isWrongClass);
   end
   errorRates = errorRates./nCases;
