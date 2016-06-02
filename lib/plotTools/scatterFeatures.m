@@ -17,12 +17,12 @@ load('./images/feature-eval-images/feature_values.mat');
 
 %% Plot all features
 figure(1);
-h_gplot = gplotmatrix(features(:,1:end), features(:,1:end), key);
+h_gplot = gplotmatrix(features(:,1:4), features(:,1:4), key);
 
 %% Plot separate features
 
 % Choose features to plot
-f1 = 3;
+f1 = 1;
 f2 = 4;
 
 FEATURE_NAMES = {'Formfactor','Elongatedness','Convexity','Solidity',...

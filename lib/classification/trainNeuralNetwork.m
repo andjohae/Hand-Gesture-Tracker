@@ -18,9 +18,9 @@ targets(2,~logical(key)) = 1;
 net = patternnet(hiddenLayerSize,'trainscg');
 
 % Set up data fractions for Training, Validation, Testing
-net.divideParam.trainRatio = 0.7;
-net.divideParam.valRatio = 0.15;
-net.divideParam.testRatio = 0.15;
+net.divideParam.trainRatio = 0.6;
+net.divideParam.valRatio = 0.2;
+net.divideParam.testRatio = 0.2;
 
 % Train network
 [net, tr] = train(net, inputs, targets);

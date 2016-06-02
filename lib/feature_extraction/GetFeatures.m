@@ -11,7 +11,10 @@ function features = GetFeatures(binaryImg)
 %           Convexity     = Convex perimeter / Perimeter
 %           Solidity      = Area / Convex area
 %
-% Note that all features are size invariant.
+%           Moment invariant 1 to 6 (see GetMoments.m)
+%
+% Note that all features invariant to translation, scaling, rotation and
+% mirroring.
   
   %%%%% Initialization %%%%%
   structuralElement = strel('square',3);
